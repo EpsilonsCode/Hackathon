@@ -82,6 +82,12 @@ class MyBot(HackathonBot):
     def przelicz_wszystkie_wspolczyniki_pol(self, game_state):
         for poziom in range(len(self.pola)):
             for pole in range(len(self.pola[poziom])):
+                for entity in game_state.map.tiles[poziom][pole].entities:
+                    if isinstance(entity, PlayerTank):
+                        if entity.owner_id == game_state.my_agent.id:
+                            self.my_position = (poziom, pole)
+                        else:
+                            self.enemies.append((poziom, pole))
 
                 if self.pola[poziom][pole].is_wall:
                     self.pola[poziom][pole].wsp = -1000
@@ -124,9 +130,7 @@ class MyBot(HackathonBot):
                                     for pole_2 in range(len(self.pola)):
                                         if pole_2 > poziom:
                                             self.pola[pole_2][pole].wsp -= 10
-        for poziom in self.pola:
-            for pole in poziom:
-                pole.wsp = 0
+
         print("-------------------------------------")
         for poziom in range(len(self.pola)):
             for pole in range(len(self.pola[poziom])):
