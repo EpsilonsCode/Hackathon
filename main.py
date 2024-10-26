@@ -181,15 +181,11 @@ class MyBot(HackathonBot):
         if not self.initialized_walls:
             #self.initialized_walls = True
             #self.enemies = list()
-            #self.pola = [[0 for _ in range(22)] for _ in range(22)]
             for poziom in range(len(self.pola)):
                 for pole in range(len(self.pola[poziom])):
                     contains_instance = any(isinstance(item, Wall) for item in game_state.map.tiles[poziom][pole].entities)
                     self.pola[poziom][pole].is_wall = contains_instance
 
-                    #print(poziom, pole)
-            #self.przelicz_wszystkie_wspolczyniki_pol(game_state, game_state.my_agent)
-            #print(len(game_state.map.tiles))
         self.przelicz_wszystkie_wspolczyniki_pol(game_state)
 
     def ruch_wiezy(self, gamestate):
@@ -320,6 +316,7 @@ class MyBot(HackathonBot):
         #             print(math.floor(self.pola[poziom][pole].wsp), end='  ')
         #     print()
         #
+
     def __init__(self):
         self.enemies = list()
         self.my_position = tuple()
