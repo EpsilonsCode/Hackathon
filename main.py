@@ -1,3 +1,5 @@
+import heapq
+
 from hackathon_bot import *
 
 
@@ -10,6 +12,49 @@ class Pole:
 
 
 class MyBot(HackathonBot):
+
+
+    @staticmethod
+    def a_star(walls, start, goal):
+        rows, cols = len(walls), len(walls[0])
+        open_set = []
+        heapq.heappush(open_set, (0, start))
+
+        came_from = {}
+        g_score = {start: 0}
+        f_score = {start: Agent.heuristic(start, goal)}
+
+        while open_set:
+            _, current = heapq.heappop(open_set)
+
+            if current == goal:
+                path = []
+                while current in came_from:
+                    path.append(current)
+                    current = came_from[current]
+                path.append(start)
+                path.reverse()
+                return path
+
+            neighbors = [
+                (current[0] + 1, current[1]),
+                (current[0] - 1, current[1]),
+                (current[0], current[1] + 1),
+                (current[0], current[1] - 1)
+            ]
+
+            for neighbor in neighbors:
+                if 0 <= neighbor[0] < rows and 0 <= neighbor[1] < cols and walls[neighbor[0]][neighbor[1]] == 0:
+                    tentative_g_score = g_score[current] + 1
+                    if neighbor not in g_score or tentative_g_score < g_score[neighbor]:
+                        came_from[neighbor] = current
+                        g_score[neighbor] = tentative_g_score
+                        f_score[neighbor] = tentative_g_score + Agent.heuristic(neighbor, goal)
+                        heapq.heappush(open_set, (f_score[neighbor], neighbor))
+
+        return None
+
+
 
     def on_lobby_data_received(self, lobby_data: LobbyData) -> None:
         pass
@@ -37,6 +82,10 @@ class MyBot(HackathonBot):
     def przelicz_wszystkie_wspolczyniki_pol(self, game_state):
         for poziom in range(len(self.pola)):
             for pole in range(len(self.pola[poziom])):
+
+                if self.pola[poziom][pole].is_wall:
+                    self.pola[poziom][pole].wsp = -1000
+                    break
                 if game_state.map.tiles[poziom][pole].is_visible:
                     self.pola[poziom][pole].wsp = 1
                 else:
@@ -45,9 +94,12 @@ class MyBot(HackathonBot):
         ## zmiana współczynnika za każdy widziany element
         for poziom in range(len(self.pola)):
             for pole in range(len(self.pola[poziom])):
+                if self.pola[poziom][pole].is_wall:
+                    break
                 if game_state.map.tiles[poziom][pole].is_visible:
                     ## wyjęcie wszystkich elementów z danego pola
                     for entity in game_state.map.tiles[poziom][pole].entities:
+
                         ## jeśli to wróg odejmujemy i patrzymy czy ma wieżę w naszą stornę
                         if isinstance(entity, PlayerTank):
                             if entity.owner_id != game_state.my_agent.id:
@@ -83,9 +135,11 @@ class MyBot(HackathonBot):
                     print("#", end='')
                 else:
                     print(' ', end='')
-
+            print()
 
     def __init__(self):
+        self.enemies = list()
+        self.my_position = tuple()
         self.initialized_walls = False
         self.pola = [[0 for _ in range(24)] for _ in range(24)]
         for poziom in range(len(self.pola)):
