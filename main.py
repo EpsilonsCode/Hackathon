@@ -1,4 +1,5 @@
 import heapq
+import math
 
 from hackathon_bot import *
 
@@ -105,7 +106,6 @@ class MyBot(HackathonBot):
                 if game_state.map.tiles[poziom][pole].is_visible:
                     ## wyjęcie wszystkich elementów z danego pola
                     for entity in game_state.map.tiles[poziom][pole].entities:
-
                         ## jeśli to wróg odejmujemy i patrzymy czy ma wieżę w naszą stornę
                         if isinstance(entity, PlayerTank):
                             if entity.owner_id != game_state.my_agent.id:
@@ -116,17 +116,17 @@ class MyBot(HackathonBot):
                                         if poziom_2 < poziom:
                                             self.pola[poziom_2][pole].wsp -= 10
                                 ## jeśli w dół
-                                if entity.turret.direction == Direction.DOWN:
+                                elif entity.turret.direction == Direction.DOWN:
                                     for poziom_2 in range(len(self.pola)):
                                         if poziom_2 > poziom:
                                             self.pola[poziom_2][pole].wsp -= 10
                                 ## jeśli w lewo
-                                if entity.turret.direction == Direction.LEFT:
+                                elif entity.turret.direction == Direction.LEFT:
                                     for pole_2 in range(len(self.pola)):
                                         if pole_2 < poziom:
                                             self.pola[pole_2][pole].wsp -= 10
                                 ## jeśli w prawo
-                                if entity.turret.direction == Direction.LEFT:
+                                elif entity.turret.direction == Direction.LEFT:
                                     for pole_2 in range(len(self.pola)):
                                         if pole_2 > poziom:
                                             self.pola[pole_2][pole].wsp -= 10
@@ -134,11 +134,10 @@ class MyBot(HackathonBot):
         print("-------------------------------------")
         for poziom in range(len(self.pola)):
             for pole in range(len(self.pola[poziom])):
-                #print(poziom, pole )
                 if self.pola[poziom][pole].is_wall:
-                    print("#", end='')
+                    print("#", end=' ')
                 else:
-                    print(' ', end='')
+                    print(math.floor(self.pola[poziom][pole].wsp), end=' ')
             print()
 
     def __init__(self):
