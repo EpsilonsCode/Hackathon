@@ -19,6 +19,7 @@ wsp_laser = -80
 wsp_mine = -40
 wsp_wall = -1000
 wsp_podnoszenia_przy_pelnym_ekwipunku = 0.6
+wsp_stref = 10
 
 
 class Pole:
@@ -131,9 +132,10 @@ class MyBot(HackathonBot):
             #self.przelicz_wszystkie_wspolczyniki_pol(game_state, game_state.my_agent)
             #print(len(game_state.map.tiles))
         self.przelicz_wszystkie_wspolczyniki_pol(game_state)
-    def ruch_wiezy(self, gamestate):
 
+    def ruch_wiezy(self, gamestate):
         pass
+
     def on_game_ended(self, game_result: GameResult) -> None:
         pass
 
@@ -171,12 +173,18 @@ class MyBot(HackathonBot):
                 else:
                     self.pola[poziom][pole].wsp *= wsp_wygasania_niewidocznych
 
+        for zone in game_state.map.zones:
+            for i in range(zone.height):
+                for j in range(zone.width):
+                    self.pola[zone.y+i][zone.x+j].wsp += wsp_stref
+
         #print(self.a_star(walkable, (1, 1), (4, 4)))
         #print(self.get_directions(walkable, (1, 1), (4,4)))
         #for p in self.a_star(walkable, (1,1), (4,4)):
         #    print(self.pola[p[0]][p[1]].is_wall)
         #print(self.my_position[1])
 
+        obecny_wsp_podnoszenia = wsp_podnoszenia_przy_pelnym_ekwipunku
         ## zmiana współczynnika za każdy widziany element
         for poziom in range(len(self.pola)):
             for pole in range(len(self.pola[poziom])):
@@ -218,18 +226,20 @@ class MyBot(HackathonBot):
                                             self.pola[poziom][pole_2].wsp += wsp_obserwowanego_pola
                                             if self.pola[poziom][pole_2].is_wall:
                                                 break
-                        ## jeśli jest itemem dodajemy współczynniki
+                        #jeśli nie mamy itema ustawiamy wsp podnoszenia na 1
+                        elif isinstance(entity, AgentTank):
+                            if entity.secondary_item is None:
+                                obecny_wsp_podnoszenia = 1
+                        ## jeśli jest itemem dodajemy wsp mnożony przez współczynnik podnoszenia
                         elif isinstance(entity, Item):
-                            if game_state.map.tiles[poziom][pole].
-                            obecny_wsp_podnoszenia = wsp_podnoszenia_przy_pelnym_ekwipunku
                             if entity.type is ItemType.LASER:
-                                self.pola[poziom][pole].wsp += wsp_item_laser
+                                self.pola[poziom][pole].wsp += wsp_item_laser*obecny_wsp_podnoszenia
                             if entity.type is ItemType.DOUBLE_BULLET:
-                                self.pola[poziom][pole].wsp += wsp_item_double_bullet
+                                self.pola[poziom][pole].wsp += wsp_item_double_bullet*obecny_wsp_podnoszenia
                             if entity.type is ItemType.MINE:
-                                self.pola[poziom][pole].wsp += wsp_item_mine
+                                self.pola[poziom][pole].wsp += wsp_item_mine*obecny_wsp_podnoszenia
                             if entity.type is ItemType.RADAR:
-                                self.pola[poziom][pole].wsp += wsp_item_radar
+                                self.pola[poziom][pole].wsp += wsp_item_radar*obecny_wsp_podnoszenia
                             if entity.type is ItemType.UNKNOWN:
                                 self.pola[poziom][pole].wsp += wsp_item_unknown
                         ## jeśli jest jakimś rodzajem pocisku dodajemy ujemny współczynnik
