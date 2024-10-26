@@ -15,12 +15,26 @@ class MyBot(HackathonBot):
 
     def next_move(self, game_state: GameState) -> ResponseAction:
         pass
+        self.przelicz_wszystkie_wspolczyniki_pol(game_state, game_state.my_agent)
 
     def on_game_ended(self, game_result: GameResult) -> None:
         pass
 
     def on_warning_received(self, warning: WarningType, message: str | None) -> None:
         pass
+
+
+    def przelicz_wszystkie_wspolczyniki_pol(self, game_state, player_state):
+        for poziom in self.pola:
+            for pole in poziom:
+                pole.wsp = 0
+
+        for poziom in self.pola:
+            print()
+            for pole in poziom:
+                print(pole.wsp, end=', ')
+        print()
+
 
     def __init__(self):
         self.pola = [[0 for _ in range(22)] for _ in range(22)]
