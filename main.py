@@ -50,6 +50,16 @@ class MyBot(HackathonBot):
                                     for poziom_2 in range(len(self.pola)):
                                         if poziom_2 > poziom:
                                             self.pola[poziom_2][pole].wsp -= 10
+                                ## jeśli w lewo
+                                if entity.turret.direction == Direction.LEFT:
+                                    for pole_2 in range(len(self.pola)):
+                                        if pole_2 < poziom:
+                                            self.pola[pole_2][pole].wsp -= 10
+                                ## jeśli w prawo
+                                if entity.turret.direction == Direction.LEFT:
+                                    for pole_2 in range(len(self.pola)):
+                                        if pole_2 > poziom:
+                                            self.pola[pole_2][pole].wsp -= 10
 
 
         for poziom in self.pola:
