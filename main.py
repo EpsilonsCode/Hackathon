@@ -18,6 +18,7 @@ wsp_double_bullet = -40
 wsp_laser = -80
 wsp_mine = -40
 wsp_wall = -1000
+wsp_podnoszenia_przy_pelnym_ekwipunku = 0.6
 
 
 class Pole:
@@ -181,6 +182,7 @@ class MyBot(HackathonBot):
         #for p in self.a_star(walkable, (1,1), (4,4)):
         #    print(self.pola[p[0]][p[1]].is_wall)
         #print(self.my_position[1])
+
         ## zmiana współczynnika za każdy widziany element
         for poziom in range(len(self.pola)):
             for pole in range(len(self.pola[poziom])):
@@ -224,6 +226,8 @@ class MyBot(HackathonBot):
                                                 break
                         ## jeśli jest itemem dodajemy współczynniki
                         elif isinstance(entity, Item):
+                            if game_state.map.tiles[poziom][pole].
+                            obecny_wsp_podnoszenia = wsp_podnoszenia_przy_pelnym_ekwipunku
                             if entity.type is ItemType.LASER:
                                 self.pola[poziom][pole].wsp += wsp_item_laser
                             if entity.type is ItemType.DOUBLE_BULLET:
@@ -234,6 +238,7 @@ class MyBot(HackathonBot):
                                 self.pola[poziom][pole].wsp += wsp_item_radar
                             if entity.type is ItemType.UNKNOWN:
                                 self.pola[poziom][pole].wsp += wsp_item_unknown
+                        ## jeśli jest jakimś rodzajem pocisku dodajemy ujemny współczynnik
                         elif isinstance(entity, Bullet):
                             self.pola[poziom][pole].wsp += wsp_bullet
                         elif isinstance(entity, DoubleBullet):
