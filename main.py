@@ -14,7 +14,6 @@ class MyBot(HackathonBot):
         pass
 
     def next_move(self, game_state: GameState) -> ResponseAction:
-        pass
         self.przelicz_wszystkie_wspolczyniki_pol(game_state, game_state.my_agent)
 
     def on_game_ended(self, game_result: GameResult) -> None:
