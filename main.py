@@ -2,7 +2,7 @@ import heapq
 import math
 
 from hackathon_bot import *
-
+from test import find_closest_point
 
 wsp_wygasania_niewidocznych = 0.8
 wsp_poczatkowy_widocznych = 1
@@ -26,6 +26,63 @@ class Pole:
         self.x = int(x)
         self.wsp = 0
         self.is_wall = False
+
+
+def find_closest_point(points, player):
+    closest_point = None
+    min_distance = float('inf')  # Initialize with a very large number
+
+    for point in points:
+        distance = math.sqrt((point[0] - player[0]) ** 2 + (point[1] - player[1]) ** 2)
+
+        if distance < min_distance:
+            min_distance = distance
+            closest_point = point
+
+    return closest_point
+
+
+def get_rotation(entity, position):
+    x, y = entity
+    px, py = position
+
+    vertical_distance = y - py
+    horizontal_distance = x - px
+    if abs(vertical_distance) >= abs(horizontal_distance):
+        return "l" if vertical_distance > 0 else "r"
+    elif abs(horizontal_distance) > abs(vertical_distance):
+        return "u" if horizontal_distance > 0 else "d"
+
+
+def rotation(letter, pos):
+    if letter == 'l':
+        if pos == 'u':
+            return 'e'
+        if pos == 'd':
+            return 'q'
+        if pos == 'r':
+            return 'q'
+    if letter == 'r':
+        if pos == 'u':
+            return 'q'
+        if pos == 'd':
+            return "e"
+        if pos == 'l':
+            return 'e'
+    if letter == 'u':
+        if pos == 'l':
+            return 'e'
+        if pos == 'r':
+            return 'q'
+        if pos == 'd':
+            return 'q'
+    if letter == 'd':
+        if pos == 'l':
+            return 'q'
+        if pos == 'r':
+            return 'e'
+        if pos == 'u':
+            return 'e'
 
 
 class MyBot(HackathonBot):
@@ -117,6 +174,8 @@ class MyBot(HackathonBot):
         pass
 
     def next_move(self, game_state: GameState) -> ResponseAction:
+        print(self.enemies)
+        print(self.my_position)
         if not self.initialized_walls:
             #self.initialized_walls = True
             #self.enemies = list()
@@ -131,8 +190,7 @@ class MyBot(HackathonBot):
             #print(len(game_state.map.tiles))
         self.przelicz_wszystkie_wspolczyniki_pol(game_state)
     def ruch_wiezy(self, gamestate):
-
-        pass
+        return rotation(get_rotation(self.my_position, find_closest_point(self.enemies, self.my_position)), 'u')
     def on_game_ended(self, game_result: GameResult) -> None:
         pass
 
@@ -237,15 +295,15 @@ class MyBot(HackathonBot):
                         elif isinstance(entity, Mine):
                             self.pola[poziom][pole].wsp += wsp_mine
 
-        print("-------------------------------------")
-        for poziom in range(len(self.pola)):
-            for pole in range(len(self.pola[poziom])):
-                if self.pola[poziom][pole].is_wall:
-                    print("#", end='  ')
-                else:
-                    print(math.floor(self.pola[poziom][pole].wsp), end='  ')
-            print()
-
+        # print("-------------------------------------")
+        # for poziom in range(len(self.pola)):
+        #     for pole in range(len(self.pola[poziom])):
+        #         if self.pola[poziom][pole].is_wall:
+        #             print("#", end='  ')
+        #         else:
+        #             print(math.floor(self.pola[poziom][pole].wsp), end='  ')
+        #     print()
+        #
     def __init__(self):
         self.enemies = list()
         self.my_position = tuple()
