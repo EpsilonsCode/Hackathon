@@ -98,6 +98,8 @@ class MyBot(HackathonBot):
                 else:
                     self.pola[poziom][pole].wsp *= 0.8
 
+        ## useless self.pola[self.my_position[0]][self.my_position[1]].wsp = -99
+
         ## zmiana współczynnika za każdy widziany element
         for poziom in range(len(self.pola)):
             for pole in range(len(self.pola[poziom])):
@@ -115,29 +117,37 @@ class MyBot(HackathonBot):
                                     for poziom_2 in range(len(self.pola)):
                                         if poziom_2 < poziom:
                                             self.pola[poziom_2][pole].wsp -= 10
+                                            if self.pola[poziom_2][pole].is_wall:
+                                                break
                                 ## jeśli w dół
                                 elif entity.turret.direction == Direction.DOWN:
                                     for poziom_2 in range(len(self.pola)):
                                         if poziom_2 > poziom:
                                             self.pola[poziom_2][pole].wsp -= 10
+                                            if self.pola[poziom_2][pole].is_wall:
+                                                break
                                 ## jeśli w lewo
                                 elif entity.turret.direction == Direction.LEFT:
                                     for pole_2 in range(len(self.pola)):
-                                        if pole_2 < poziom:
-                                            self.pola[pole_2][pole].wsp -= 10
+                                        if pole_2 < pole:
+                                            self.pola[poziom][pole_2].wsp -= 10
+                                            if self.pola[poziom][pole_2].is_wall:
+                                                break
                                 ## jeśli w prawo
                                 elif entity.turret.direction == Direction.LEFT:
                                     for pole_2 in range(len(self.pola)):
-                                        if pole_2 > poziom:
-                                            self.pola[pole_2][pole].wsp -= 10
+                                        if pole_2 > pole:
+                                            self.pola[poziom][pole_2].wsp -= 10
+                                            if self.pola[poziom][pole_2].is_wall:
+                                                break
 
         print("-------------------------------------")
         for poziom in range(len(self.pola)):
             for pole in range(len(self.pola[poziom])):
                 if self.pola[poziom][pole].is_wall:
-                    print("#", end=' ')
+                    print("#", end='  ')
                 else:
-                    print(math.floor(self.pola[poziom][pole].wsp), end=' ')
+                    print(math.floor(self.pola[poziom][pole].wsp), end='  ')
             print()
 
     def __init__(self):
