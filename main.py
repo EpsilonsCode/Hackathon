@@ -29,6 +29,22 @@ class Pole:
         self.wsp = 0
         self.is_wall = False
 
+def get_direction_of_player(position, game_state: GameState):
+    return game_state.map.tiles[position[0]][position[1]].entities[0].direction
+
+def get_turret_direction_of_player(position, game_state: GameState):
+    return game_state.map.tiles[position[0]][position[1]].entities[0].turret.direction
+
+
+def convert_to_letters(direction: Direction):
+    if direction is Direction.UP:
+        return 'u'
+    if direction is Direction.LEFT:
+        return 'l'
+    if direction is Direction.RIGHT:
+        return 'r'
+    if direction is Direction.DOWN:
+        return 'd'
 
 def find_closest_point(points, player):
     closest_point = None
@@ -176,8 +192,6 @@ class MyBot(HackathonBot):
         pass
 
     def next_move(self, game_state: GameState) -> ResponseAction:
-        print(self.enemies)
-        print(self.my_position)
         if not self.initialized_walls:
             #self.initialized_walls = True
             #self.enemies = list()
@@ -187,6 +201,8 @@ class MyBot(HackathonBot):
                     self.pola[poziom][pole].is_wall = contains_instance
 
         self.przelicz_wszystkie_wspolczyniki_pol(game_state)
+        print(convert_to_letters(get_direction_of_player(self.my_position, game_state)))
+        print(convert_to_letters(get_turret_direction_of_player(self.my_position, game_state)))
 
     def ruch_wiezy(self, gamestate):
         return rotation(get_rotation(self.my_position, find_closest_point(self.enemies, self.my_position)), 'u')
