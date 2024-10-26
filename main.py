@@ -131,7 +131,9 @@ class MyBot(HackathonBot):
             #self.przelicz_wszystkie_wspolczyniki_pol(game_state, game_state.my_agent)
             #print(len(game_state.map.tiles))
         self.przelicz_wszystkie_wspolczyniki_pol(game_state)
+    def ruch_wiezy(self, gamestate):
 
+        pass
     def on_game_ended(self, game_result: GameResult) -> None:
         pass
 
@@ -140,36 +142,28 @@ class MyBot(HackathonBot):
 
     def przelicz_wszystkie_wspolczyniki_pol(self, game_state):
         walkable = [[0 for _ in range(24)] for _ in range(24)]
+        self.enemies = list()
         for poziom in range(len(self.pola)):
             for pole in range(len(self.pola[poziom])):
                 contains_instance = any(isinstance(item, (Wall, Bullet, DoubleBullet, Laser, Mine, PlayerTank)) for item in game_state.map.tiles[poziom][pole].entities)
                 if contains_instance:
                     walkable[poziom][pole] = 1
-
-        self.enemies = list()
-
+                contains_instance = any(
+                    isinstance(item, (PlayerTank)) for item in
+                    game_state.map.tiles[poziom][pole].entities)
+                if contains_instance:
+                    self.enemies.append((poziom, pole))
+                contains_instance = any(
+                    isinstance(item, (AgentTank)) for item in
+                    game_state.map.tiles[poziom][pole].entities)
+                if contains_instance:
+                    self.my_position = (poziom, pole)
+        while self.my_position in self.enemies:
+            self.enemies.remove(self.my_position)
 
         for poziom in range(len(self.pola)):
             for pole in range(len(self.pola[poziom])):
-                for entity in game_state.map.tiles[poziom][pole].entities:
-                    contains_instance = any(
-                        isinstance(item, Wall) for item in game_state.map.tiles[poziom][pole].entities)
-                    if contains_instance:
-                        walkable[poziom][pole] = 1
-                        #self.my_position = (poziom, pole)
-                    if isinstance(entity, PlayerTank):
-                        if entity.owner_id == game_state.my_agent.id:
-                            print('------------------')
-                            print((poziom, pole))
-                            self.my_position = (poziom, pole)
-                        else:
-                            self.enemies.append((poziom, pole))
-                            walkable[poziom][pole] = 1
-                    if isinstance(entity, Laser) or isinstance(entity, Bullet) or isinstance(entity, Mine) or isinstance(entity, DoubleBullet):
-                        walkable[poziom][pole] = 1
-
                 if self.pola[poziom][pole].is_wall:
-                    walkable[poziom][pole] = 1
                     self.pola[poziom][pole].wsp = wsp_wall
                     continue
                 if game_state.map.tiles[poziom][pole].is_visible:
