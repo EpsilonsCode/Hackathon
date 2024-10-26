@@ -24,16 +24,54 @@ class MyBot(HackathonBot):
                     contains_instance = any(isinstance(item, Wall) for item in game_state.map.tiles[poziom][pole].entities)
                     self.pola[poziom][pole].is_wall = contains_instance
                     #print(poziom, pole)
-            self.przelicz_wszystkie_wspolczyniki_pol(game_state, game_state.my_agent)
+            #self.przelicz_wszystkie_wspolczyniki_pol(game_state, game_state.my_agent)
             #print(len(game_state.map.tiles))
+        self.przelicz_wszystkie_wspolczyniki_pol(game_state)
+
     def on_game_ended(self, game_result: GameResult) -> None:
         pass
 
     def on_warning_received(self, warning: WarningType, message: str | None) -> None:
         pass
 
+    def przelicz_wszystkie_wspolczyniki_pol(self, game_state):
+        for poziom in range(len(self.pola)):
+            for pole in range(len(self.pola[poziom])):
+                if game_state.map.tiles[poziom][pole].is_visible:
+                    self.pola[poziom][pole].wsp = 1
+                else:
+                    self.pola[poziom][pole].wsp *= 0.8
 
-    def przelicz_wszystkie_wspolczyniki_pol(self, game_state, player_state):
+        ## zmiana współczynnika za każdy widziany element
+        for poziom in range(len(self.pola)):
+            for pole in range(len(self.pola[poziom])):
+                if game_state.map.tiles[poziom][pole].is_visible:
+                    ## wyjęcie wszystkich elementów z danego pola
+                    for entity in game_state.map.tiles[poziom][pole].entities:
+                        ## jeśli to wróg odejmujemy i patrzymy czy ma wieżę w naszą stornę
+                        if isinstance(entity, PlayerTank):
+                            if entity.owner_id != game_state.my_agent.id:
+                                self.pola[poziom][pole].wsp -= 5
+                                ## jeśli go góry
+                                if entity.turret.direction == Direction.UP:
+                                    for poziom_2 in range(len(self.pola)):
+                                        if poziom_2 < poziom:
+                                            self.pola[poziom_2][pole].wsp -= 10
+                                ## jeśli w dół
+                                if entity.turret.direction == Direction.DOWN:
+                                    for poziom_2 in range(len(self.pola)):
+                                        if poziom_2 > poziom:
+                                            self.pola[poziom_2][pole].wsp -= 10
+                                ## jeśli w lewo
+                                if entity.turret.direction == Direction.LEFT:
+                                    for pole_2 in range(len(self.pola)):
+                                        if pole_2 < poziom:
+                                            self.pola[pole_2][pole].wsp -= 10
+                                ## jeśli w prawo
+                                if entity.turret.direction == Direction.LEFT:
+                                    for pole_2 in range(len(self.pola)):
+                                        if pole_2 > poziom:
+                                            self.pola[pole_2][pole].wsp -= 10
         for poziom in self.pola:
             for pole in poziom:
                 pole.wsp = 0
@@ -45,8 +83,6 @@ class MyBot(HackathonBot):
                     print("#", end='')
                 else:
                     print(' ', end='')
-            print()
-        
 
 
     def __init__(self):
@@ -55,6 +91,7 @@ class MyBot(HackathonBot):
         for poziom in range(len(self.pola)):
             for pole in range(len(self.pola[poziom])):
                 self.pola[poziom][pole] = Pole(pole, poziom)
+                self.pola[poziom][pole].wsp = 0;
 
 
 if __name__ == "__main__":
