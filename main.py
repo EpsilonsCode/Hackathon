@@ -1,4 +1,5 @@
 import heapq
+import math
 
 from hackathon_bot import *
 
@@ -121,7 +122,6 @@ class MyBot(HackathonBot):
         pass
 
     def przelicz_wszystkie_wspolczyniki_pol(self, game_state):
-        #print(game_state.map.tiles[1][1].enties[0])
         walkable = [[0 for _ in range(24)] for _ in range(24)]
         for poziom in range(len(self.pola)):
             for pole in range(len(self.pola[poziom])):
@@ -130,6 +130,21 @@ class MyBot(HackathonBot):
                     walkable[poziom][pole] = 1
 
         self.enemies = list()
+        wsp_wygasania_niewidocznych = 0.8
+        wsp_poczatkowy_widocznych = 1
+        wsp_pola_z_wrogiem = -5
+        wsp_obserwowanego_pola = -10
+        wsp_item_laser = 20
+        wsp_item_double_bullet = 10
+        wsp_item_mine = 5
+        wsp_item_radar = 10
+        wsp_item_unknown = -20
+        wsp_bullet = -20
+        wsp_double_bullet = -40
+        wsp_laser = -80
+        wsp_mine = -40
+        wsp_wall = -1000
+
         for poziom in range(len(self.pola)):
             for pole in range(len(self.pola[poziom])):
                 for entity in game_state.map.tiles[poziom][pole].entities:
@@ -150,28 +165,18 @@ class MyBot(HackathonBot):
                         walkable[poziom][pole] = 1
 
                 if self.pola[poziom][pole].is_wall:
-                    self.pola[poziom][pole].wsp = -1000
                     walkable[poziom][pole] = 1
-                    break
+                    self.pola[poziom][pole].wsp = wsp_wall
+                    continue
                 if game_state.map.tiles[poziom][pole].is_visible:
-                    self.pola[poziom][pole].wsp = 1
+                    self.pola[poziom][pole].wsp = wsp_poczatkowy_widocznych
                 else:
-                    self.pola[poziom][pole].wsp *= 0.8
+                    self.pola[poziom][pole].wsp *= wsp_wygasania_niewidocznych
 
-        # print("-------------------------------------")
-        # for poziom in range(len(self.pola)):
-        #     for pole in range(len(self.pola[poziom])):
-        #         # print(poziom, pole )
-        #         if self.pola[poziom][pole].is_wall:
-        #             print("#", end='')
-        #         else:
-        #             print(' ', end='')
-        #     print()
-
-        print(self.a_star(walkable, (1, 1), (4, 4)))
-        print(self.get_directions(walkable, (1, 1), (4,4)))
-        for p in self.a_star(walkable, (1,1), (4,4)):
-            print(self.pola[p[0]][p[1]].is_wall)
+        #print(self.a_star(walkable, (1, 1), (4, 4)))
+        #print(self.get_directions(walkable, (1, 1), (4,4)))
+        #for p in self.a_star(walkable, (1,1), (4,4)):
+        #    print(self.pola[p[0]][p[1]].is_wall)
         #print(self.my_position[1])
         ## zmiana współczynnika za każdy widziany element
         for poziom in range(len(self.pola)):
@@ -181,52 +186,68 @@ class MyBot(HackathonBot):
                 if game_state.map.tiles[poziom][pole].is_visible:
                     ## wyjęcie wszystkich elementów z danego pola
                     for entity in game_state.map.tiles[poziom][pole].entities:
-
                         ## jeśli to wróg odejmujemy i patrzymy czy ma wieżę w naszą stornę
                         if isinstance(entity, PlayerTank):
                             print("tank", entity)
                             if entity.owner_id != game_state.my_agent.id:
-                                self.pola[poziom][pole].wsp -= 5
+                                self.pola[poziom][pole].wsp += wsp_pola_z_wrogiem
                                 ## jeśli go góry
-                                if entity.turret.direction == Direction.UP:
+                                if entity.turret.direction is Direction.UP:
                                     for poziom_2 in range(len(self.pola)):
                                         if poziom_2 < poziom:
-                                            self.pola[poziom_2][pole].wsp -= 10
+                                            self.pola[poziom_2][pole].wsp += wsp_obserwowanego_pola
+                                            if self.pola[poziom_2][pole].is_wall:
+                                                break
                                 ## jeśli w dół
-                                if entity.turret.direction == Direction.DOWN:
+                                elif entity.turret.direction is Direction.DOWN:
                                     for poziom_2 in range(len(self.pola)):
                                         if poziom_2 > poziom:
-                                            self.pola[poziom_2][pole].wsp -= 10
+                                            self.pola[poziom_2][pole].wsp += wsp_obserwowanego_pola
+                                            if self.pola[poziom_2][pole].is_wall:
+                                                break
                                 ## jeśli w lewo
-                                if entity.turret.direction == Direction.LEFT:
+                                elif entity.turret.direction is Direction.LEFT:
                                     for pole_2 in range(len(self.pola)):
-                                        if pole_2 < poziom:
-                                            self.pola[pole_2][pole].wsp -= 10
+                                        if pole_2 < pole:
+                                            self.pola[poziom][pole_2].wsp += wsp_obserwowanego_pola
+                                            if self.pola[poziom][pole_2].is_wall:
+                                                break
                                 ## jeśli w prawo
-                                if entity.turret.direction == Direction.LEFT:
+                                elif entity.turret.direction is Direction.RIGHT:
                                     for pole_2 in range(len(self.pola)):
-                                        if pole_2 > poziom:
-                                            self.pola[pole_2][pole].wsp -= 10
+                                        if pole_2 > pole:
+                                            self.pola[poziom][pole_2].wsp += wsp_obserwowanego_pola
+                                            if self.pola[poziom][pole_2].is_wall:
+                                                break
+                        ## jeśli jest itemem dodajemy współczynniki
+                        elif isinstance(entity, Item):
+                            if entity.type is ItemType.LASER:
+                                self.pola[poziom][pole].wsp += wsp_item_laser
+                            if entity.type is ItemType.DOUBLE_BULLET:
+                                self.pola[poziom][pole].wsp += wsp_item_double_bullet
+                            if entity.type is ItemType.MINE:
+                                self.pola[poziom][pole].wsp += wsp_item_mine
+                            if entity.type is ItemType.RADAR:
+                                self.pola[poziom][pole].wsp += wsp_item_radar
+                            if entity.type is ItemType.UNKNOWN:
+                                self.pola[poziom][pole].wsp += wsp_item_unknown
+                        elif isinstance(entity, Bullet):
+                            self.pola[poziom][pole].wsp += wsp_bullet
+                        elif isinstance(entity, DoubleBullet):
+                            self.pola[poziom][pole].wsp += wsp_double_bullet
+                        elif isinstance(entity, Laser):
+                            self.pola[poziom][pole].wsp += wsp_laser
+                        elif isinstance(entity, Mine):
+                            self.pola[poziom][pole].wsp += wsp_mine
 
-        # print("-------------------------------------")
-        # for poziom in range(len(self.pola)):
-        #     for pole in range(len(self.pola[poziom])):
-        #         # print(poziom, pole )
-        #         if walkable[poziom][pole] != 0:
-        #             print("#", end='')
-        #         else:
-        #             print(' ', end='')
-        #     print()
-
-        # print("-------------------------------------")
-        # for poziom in range(len(self.pola)):
-        #     for pole in range(len(self.pola[poziom])):
-        #         #print(poziom, pole )
-        #         if self.pola[poziom][pole].is_wall:
-        #             print("#", end='')
-        #         else:
-        #             print(' ', end='')
-        #     print()
+        print("-------------------------------------")
+        for poziom in range(len(self.pola)):
+            for pole in range(len(self.pola[poziom])):
+                if self.pola[poziom][pole].is_wall:
+                    print("#", end='  ')
+                else:
+                    print(math.floor(self.pola[poziom][pole].wsp), end='  ')
+            print()
 
     def __init__(self):
         self.enemies = list()
@@ -236,7 +257,7 @@ class MyBot(HackathonBot):
         for poziom in range(len(self.pola)):
             for pole in range(len(self.pola[poziom])):
                 self.pola[poziom][pole] = Pole(pole, poziom)
-                self.pola[poziom][pole].wsp = 0;
+                self.pola[poziom][pole].wsp = 0
 
 
 if __name__ == "__main__":
