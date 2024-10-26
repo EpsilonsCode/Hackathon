@@ -6,6 +6,7 @@ class Pole:
         self.y = int(y)
         self.x = int(x)
         self.wsp = 0
+        self.is_wall = False
 
 
 class MyBot(HackathonBot):
@@ -14,8 +15,17 @@ class MyBot(HackathonBot):
         pass
 
     def next_move(self, game_state: GameState) -> ResponseAction:
-        self.przelicz_wszystkie_wspolczyniki_pol(game_state, game_state.my_agent)
+        if not self.initialized_walls:
+            self.initialized_walls = True
 
+            #self.pola = [[0 for _ in range(22)] for _ in range(22)]
+            for poziom in range(len(self.pola)):
+                for pole in range(len(self.pola[poziom])):
+                    contains_instance = any(isinstance(item, Wall) for item in game_state.map.tiles[poziom][pole].entities)
+                    self.pola[poziom][pole].is_wall = contains_instance
+                    print(poziom, pole)
+            self.przelicz_wszystkie_wspolczyniki_pol(game_state, game_state.my_agent)
+            print(len(game_state.map.tiles))
     def on_game_ended(self, game_result: GameResult) -> None:
         pass
 
@@ -27,16 +37,21 @@ class MyBot(HackathonBot):
         for poziom in self.pola:
             for pole in poziom:
                 pole.wsp = 0
-
-        for poziom in self.pola:
+        print("-------------------------------------")
+        for poziom in range(len(self.pola)):
+            for pole in range(len(self.pola[poziom])):
+                #print(poziom, pole )
+                if self.pola[poziom][pole].is_wall:
+                    print("#", end='')
+                else:
+                    print(' ', end='')
             print()
-            for pole in poziom:
-                print(pole.wsp, end=', ')
         print()
 
 
     def __init__(self):
-        self.pola = [[0 for _ in range(22)] for _ in range(22)]
+        self.initialized_walls = False
+        self.pola = [[0 for _ in range(24)] for _ in range(24)]
         for poziom in range(len(self.pola)):
             for pole in range(len(self.pola[poziom])):
                 self.pola[poziom][pole] = Pole(pole, poziom)
