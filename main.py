@@ -23,9 +23,9 @@ class MyBot(HackathonBot):
                 for pole in range(len(self.pola[poziom])):
                     contains_instance = any(isinstance(item, Wall) for item in game_state.map.tiles[poziom][pole].entities)
                     self.pola[poziom][pole].is_wall = contains_instance
-                    print(poziom, pole)
+                    #print(poziom, pole)
             self.przelicz_wszystkie_wspolczyniki_pol(game_state, game_state.my_agent)
-            print(len(game_state.map.tiles))
+            #print(len(game_state.map.tiles))
     def on_game_ended(self, game_result: GameResult) -> None:
         pass
 
@@ -46,7 +46,7 @@ class MyBot(HackathonBot):
                 else:
                     print(' ', end='')
             print()
-        print()
+        
 
 
     def __init__(self):
