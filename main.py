@@ -4,6 +4,22 @@ import math
 from hackathon_bot import *
 
 
+wsp_wygasania_niewidocznych = 0.8
+wsp_poczatkowy_widocznych = 1
+wsp_pola_z_wrogiem = -5
+wsp_obserwowanego_pola = -10
+wsp_item_laser = 20
+wsp_item_double_bullet = 10
+wsp_item_mine = 5
+wsp_item_radar = 10
+wsp_item_unknown = -20
+wsp_bullet = -20
+wsp_double_bullet = -40
+wsp_laser = -80
+wsp_mine = -40
+wsp_wall = -1000
+
+
 class Pole:
     def __init__(self, x, y):
         self.y = int(y)
@@ -130,20 +146,7 @@ class MyBot(HackathonBot):
                     walkable[poziom][pole] = 1
 
         self.enemies = list()
-        wsp_wygasania_niewidocznych = 0.8
-        wsp_poczatkowy_widocznych = 1
-        wsp_pola_z_wrogiem = -5
-        wsp_obserwowanego_pola = -10
-        wsp_item_laser = 20
-        wsp_item_double_bullet = 10
-        wsp_item_mine = 5
-        wsp_item_radar = 10
-        wsp_item_unknown = -20
-        wsp_bullet = -20
-        wsp_double_bullet = -40
-        wsp_laser = -80
-        wsp_mine = -40
-        wsp_wall = -1000
+
 
         for poziom in range(len(self.pola)):
             for pole in range(len(self.pola[poziom])):
