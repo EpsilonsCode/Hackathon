@@ -6,14 +6,14 @@ from hackathon_bot import *
 
 wsp_wygasania_niewidocznych = 0.8
 wsp_poczatkowy_widocznych = 0.5
-wsp_pola_z_wrogiem = -5
+wsp_pola_z_wrogiem = -10
 wsp_obserwowanego_pola = -5
 wsp_nieobserwowanego_pola = 5
-wsp_pod_graczem = -2
+wsp_pod_graczem = -3
 
 wsp_item_laser = 30
 wsp_item_double_bullet = 15
-wsp_item_mine = 8
+wsp_item_mine = 10
 wsp_item_radar = 15
 wsp_item_unknown = -20
 
@@ -25,12 +25,11 @@ wsp_wall = -1000
 
 wsp_podnoszenia_przy_pelnym_ekwipunku = 0.6
 
-wsp_stref = 3
-wsp_stref_neutral = 3
-wsp_stref_being_captured = 4
+wsp_stref_neutral = 3.5
+wsp_stref_being_captured = 5
 wsp_stref_captured = 2.5
 wsp_stref_being_contested = 2
-wsp_stref_being_retaken = 2
+wsp_stref_being_retaken = 3.5
 
 wsp_rage = 1.5
 wsp_min_score_per_tick_rage = 1
@@ -247,7 +246,7 @@ class MyBot(HackathonBot):
     def next_move(self, game_state: GameState) -> ResponseAction:
         self.my_tick += 1
 
-        if self.my_tick % 1000 == 0:
+        if self.my_tick % 30 == 0:
             self.show_map()
 
         if not self.initialized_walls:
