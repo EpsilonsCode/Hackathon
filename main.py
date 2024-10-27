@@ -261,8 +261,8 @@ class MyBot(HackathonBot):
         najlepsze_pole = self.pola[0][0]
 
 
-        #if self.my_tick % 30 == 0:
-        #    self.show_map()
+        if self.my_tick % 1000 == 0:
+            self.show_map()
 
         self.przelicz_wszystkie_wspolczyniki_pol(game_state)
         if get_direction_of_player(self.my_position, game_state) is not get_turret_direction_of_player(self.my_position, game_state):
@@ -285,12 +285,12 @@ class MyBot(HackathonBot):
         else:
             self.counter += 1
         self.pola[self.xv][self.yv].wsp += 3
-        print()
+        #print()
         if self.counter < 30:
-            print('a')
+            #print('a')
             dirs = self.get_directions(self.walkable, (self.my_position[0], self.my_position[1]), (self.xv, self.yv), convert_to_letters(get_direction_of_player(self.my_position, game_state)))
         else:
-            print('b')
+            #print('b')
             dirs = self.get_directions(self.walkable, (self.my_position[0], self.my_position[1]), (najlepsze_pole.x, najlepsze_pole.y), convert_to_letters(get_direction_of_player(self.my_position, game_state)))
 
         action = self.action_coefficient(game_state, najwyzszy_wsp_pol)
