@@ -27,7 +27,7 @@ wsp_podnoszenia_przy_pelnym_ekwipunku = 0.6
 
 wsp_stref_neutral = 6
 wsp_stref_being_captured = 4
-wsp_stref_captured = 2.5
+wsp_stref_captured = 3
 wsp_stref_being_contested = 2
 wsp_stref_being_retaken = 4
 
@@ -423,7 +423,7 @@ class MyBot(HackathonBot):
         pass
 
     def przelicz_wszystkie_wspolczyniki_pol(self, game_state):
-        self.walkable = [[0 for _ in range(24)] for _ in range(24)]
+        self.walkable = [[0 for _ in range(22)] for _ in range(22)]
         self.enemies = list()
         for poziom in range(len(self.pola)):
             for pole in range(len(self.pola[poziom])):
@@ -638,8 +638,8 @@ class MyBot(HackathonBot):
         self.enemies = list()
         self.my_position = tuple()
         self.initialized_walls = False
-        self.pola = [[0 for _ in range(24)] for _ in range(24)]
-        self.walkable = [[0 for _ in range(24)] for _ in range(24)]
+        self.pola = [[0 for _ in range(22)] for _ in range(22)]
+        self.walkable = [[0 for _ in range(22)] for _ in range(22)]
         self.counter = 0
         self.xv = 1
         self.yv = 1
