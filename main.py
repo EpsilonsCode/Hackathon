@@ -5,15 +5,16 @@ import random
 from hackathon_bot import *
 
 wsp_wygasania_niewidocznych = 0.8
-wsp_poczatkowy_widocznych = 1
+wsp_poczatkowy_widocznych = 0.5
 wsp_pola_z_wrogiem = -5
-wsp_obserwowanego_pola = -10
-wsp_nieobserwowanego_pola = 10
+wsp_obserwowanego_pola = -5
+wsp_nieobserwowanego_pola = 5
+wsp_pod_graczem = -2
 
-wsp_item_laser = 20
-wsp_item_double_bullet = 10
-wsp_item_mine = 5
-wsp_item_radar = 10
+wsp_item_laser = 30
+wsp_item_double_bullet = 15
+wsp_item_mine = 8
+wsp_item_radar = 15
 wsp_item_unknown = -20
 
 wsp_bullet = -20
@@ -24,18 +25,18 @@ wsp_wall = -1000
 
 wsp_podnoszenia_przy_pelnym_ekwipunku = 0.6
 
-wsp_stref = 1.0
-wsp_stref_neutral = 1.5
-wsp_stref_being_captured = 2.0
-wsp_stref_captured = 1.0
-wsp_stref_being_contested = 1.0
-wsp_stref_being_retaken = 1.5
+wsp_stref = 3
+wsp_stref_neutral = 3
+wsp_stref_being_captured = 2.5
+wsp_stref_captured = 2
+wsp_stref_being_contested = 2
+wsp_stref_being_retaken = 2
 
 wsp_rage = 1.5
 wsp_min_score_per_tick_rage = 1
 
 rage_wsp_pola_z_wrogiem = 0.8
-rage_wsp_obserwowanego_pola = -80
+rage_wsp_obserwowanego_pola = -30
 rage_wsp_item_laser = 40
 rage_wsp_item_double_bullet = 20
 rage_wsp_item_mine = 10
@@ -244,7 +245,10 @@ class MyBot(HackathonBot):
         pass
 
     def next_move(self, game_state: GameState) -> ResponseAction:
-        #self.my_tick += 1
+        self.my_tick += 1
+
+        if self.my_tick % 100 == 0:
+            self.show_map()
 
         if not self.initialized_walls:
             self.initialized_walls = True
@@ -556,6 +560,7 @@ class MyBot(HackathonBot):
                                             self.pola[poziom-poziom_2][pole].wsp += wsp_nieobserwowanego_pola/2
                         #jeśli nie mamy itema ustawiamy wsp podnoszenia na 1
                         elif isinstance(entity, AgentTank):
+                            self.pola[poziom][pole].wsp += wsp_pod_graczem
                             if entity.secondary_item is None:
                                 obecny_wsp_podnoszenia = 1
                         # jeśli jest itemem dodajemy wsp mnożony przez współczynnik podnoszenia
