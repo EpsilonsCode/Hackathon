@@ -25,7 +25,7 @@ wsp_wall = -1000
 
 wsp_podnoszenia_przy_pelnym_ekwipunku = 0.6
 
-wsp_stref_neutral = 6
+wsp_stref_neutral = 10
 wsp_stref_being_captured = 4
 wsp_stref_captured = 3
 wsp_stref_being_contested = 2
