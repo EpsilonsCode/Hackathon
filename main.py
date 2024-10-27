@@ -46,7 +46,14 @@ class Pole:
         self.wsp = 0
         self.is_wall = False
 
+import math
 
+def interpolate(value, range_start, range_end, target_start, target_end):
+    ratio = (value - range_start) / (range_end - range_start)
+    return target_start + ratio * (target_end - target_start)
+
+def distance(point1, point2):
+    return math.sqrt((point2[0] - point1[0]) ** 2 + (point2[1] - point1[1]) ** 2)
 
 def get_direction_of_player(position, game_state: GameState):
     return game_state.map.tiles[position[0]][position[1]].entities[0].direction
@@ -185,15 +192,17 @@ class MyBot(HackathonBot):
         if tiles is None:
             return None
         previous = tiles[0]
-        directions.append('u')
+        directions.append(direction)
         for tile in tiles[1:]:
             dir = (tile[0] - previous[0], tile[1] - previous[1])
             previous = tile
-            print("essa", directions[-1:])
+            #print("essa", directions[-1:])
             if dir[1] == 1:
                 if directions[-1] == 'u':
                     directions.append('e')
                 if directions[-1] == 'd':
+                    directions.append('q')
+                if directions[-1] == 'l':
                     directions.append('q')
                 directions.append('r')
             if dir[1] == -1:
@@ -201,17 +210,23 @@ class MyBot(HackathonBot):
                     directions.append('q')
                 if directions[-1] == 'd':
                     directions.append('e')
+                if directions[-1] == 'r':
+                    directions.append('e')
                 directions.append('l')
             if dir[0] == -1:
                 if directions[-1] == 'l':
                     directions.append('e')
                 if directions[-1] == 'r':
                     directions.append('q')
+                if directions[-1] == 'd':
+                    directions.append('q')
                 directions.append('u')
             if dir[0] == 1:
                 if directions[-1] == 'l':
                     directions.append('q')
                 if directions[-1] == 'r':
+                    directions.append('e')
+                if directions[-1] == 'u':
                     directions.append('e')
                 directions.append('d')
         return directions
@@ -234,13 +249,36 @@ class MyBot(HackathonBot):
         najlepsze_pole = self.pola[0][0]
 
         self.przelicz_wszystkie_wspolczyniki_pol(game_state)
-        print(self.my_position)
+
         for poziom in range(len(self.pola)):
             for pole in range(len(self.pola[poziom])):
-                if self.pola[poziom][pole].wsp > najwyzszy_wsp_pol:
+                if self.pola[poziom][pole].wsp * interpolate(distance(self.my_position, (poziom, pole)), 0, 30, 1, 0.5) > najwyzszy_wsp_pol:
                     najwyzszy_wsp_pol = self.pola[poziom][pole].wsp
                     najlepsze_pole = self.pola[poziom][pole]
-        
+        dirs = self.get_directions(self.walkable, self.my_position, (najlepsze_pole.x, najlepsze_pole.y), convert_to_letters(get_direction_of_player(self.my_position, game_state)))
+        #print(self.ruch_wiezy(game_state))
+        #print(dirs[1])
+        #print(dirs)
+        print(dirs)
+        print(self.my_position)
+        print((najlepsze_pole.x, najlepsze_pole.y))
+        if dirs is None:
+            return Pass()
+        if len(dirs) < 1:
+            return Pass()
+
+        print(dirs)
+        print(dirs[1])
+
+        if dirs[1] == 'e':
+            print()
+            return Rotation(RotationDirection.RIGHT, RotationDirection.RIGHT)
+        elif dirs[1] == 'q':
+            return Rotation(RotationDirection.LEFT, RotationDirection.LEFT)
+        else:
+            return Movement(MovementDirection.FORWARD)
+
+
     def action_coefficient(self, game_state: GameState):
         if self.secondary_item is ItemType.MINE:
             return 50
@@ -262,13 +300,13 @@ class MyBot(HackathonBot):
         pass
 
     def przelicz_wszystkie_wspolczyniki_pol(self, game_state):
-        walkable = [[0 for _ in range(24)] for _ in range(24)]
+        self.walkable = [[0 for _ in range(24)] for _ in range(24)]
         self.enemies = list()
         for poziom in range(len(self.pola)):
             for pole in range(len(self.pola[poziom])):
                 contains_instance = any(isinstance(item, (Wall, Bullet, DoubleBullet, Laser, Mine, PlayerTank)) for item in game_state.map.tiles[poziom][pole].entities)
                 if contains_instance:
-                    walkable[poziom][pole] = 1
+                    self.walkable[poziom][pole] = 1
                 contains_instance = any(
                     isinstance(item, (PlayerTank)) for item in
                     game_state.map.tiles[poziom][pole].entities)
@@ -306,12 +344,6 @@ class MyBot(HackathonBot):
                     elif isinstance(zone, BeingRetakenZone):
                         self.pola[zone.y+i][zone.x+j].wsp += wsp_stref_being_retaken
 
-        #print(self.a_star(walkable, (1, 1), (4, 4)))
-        #print(self.get_directions(walkable, (1, 1), (4,4)))
-        #for p in self.a_star(walkable, (1,1), (4,4)):
-        #    print(self.pola[p[0]][p[1]].is_wall)
-        #print(self.my_position[1])
-
         obecny_wsp_podnoszenia = wsp_podnoszenia_przy_pelnym_ekwipunku
         ## zmiana współczynnika za każdy widziany element
         for poziom in range(len(self.pola)):
@@ -325,8 +357,6 @@ class MyBot(HackathonBot):
                         ## jeśli to wróg odejmujemy i patrzymy czy ma wieżę w naszą stornę
                         if isinstance(entity, PlayerTank):
                             if entity.owner_id != game_state.my_agent.id:
-                                #print("test")
-                                print("tank", entity)
                                 self.pola[poziom][pole].wsp += wsp_pola_z_wrogiem
                                 ## jeśli go góry
                                 if entity.turret.direction is Direction.UP:
@@ -397,9 +427,9 @@ class MyBot(HackathonBot):
                             if entity.type == ItemType.UNKNOWN:
                                 self.pola[poziom][pole].wsp += wsp_item_unknown
                         ## jeśli jest jakimś rodzajem pocisku dodajemy ujemny współczynnik
-                        elif isinstance(entity, Bullet):
-                            self.pola[poziom][pole].wsp += wsp_bullet
                         elif isinstance(entity, DoubleBullet):
+                            self.pola[poziom][pole].wsp += wsp_bullet
+                        elif isinstance(entity, Bullet):
                             self.pola[poziom][pole].wsp += wsp_double_bullet
                         elif isinstance(entity, Laser):
                             self.pola[poziom][pole].wsp += wsp_laser
@@ -435,6 +465,7 @@ class MyBot(HackathonBot):
         self.my_position = tuple()
         self.initialized_walls = False
         self.pola = [[0 for _ in range(24)] for _ in range(24)]
+        self.walkable = [[0 for _ in range(24)] for _ in range(24)]
         for poziom in range(len(self.pola)):
             for pole in range(len(self.pola[poziom])):
                 self.pola[poziom][pole] = Pole(pole, poziom)

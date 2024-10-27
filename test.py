@@ -1,6 +1,10 @@
-a = 5
+def interpolate(value, range_start, range_end, target_start, target_end):
+    ratio = (value - range_start) / (range_end - range_start)
+    return target_start + ratio * (target_end - target_start)
+print(22 * 2**0.5)
+value = 30
+print(interpolate(value, 0, 30, 1, 0.5))
 
-a /= 2
 
 
 
