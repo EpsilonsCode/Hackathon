@@ -20,6 +20,11 @@ wsp_mine = -40
 wsp_wall = -1000
 wsp_podnoszenia_przy_pelnym_ekwipunku = 0.6
 wsp_stref = 10
+wsp_stref_neutral = 15
+wsp_stref_being_captured = 20
+wsp_stref_captured = 10
+wsp_stref_being_contested = 10
+wsp_stref_being_retaken = 15
 wsp_rage = 1.5
 wsp_min_score_per_tick_rage = 1
 
@@ -230,6 +235,7 @@ class MyBot(HackathonBot):
         pass
 
     def next_move(self, game_state: GameState) -> ResponseAction:
+        self.my_tick += 1
         if not self.initialized_walls:
             self.initialized_walls = True
             #self.enemies = list()
@@ -326,7 +332,16 @@ class MyBot(HackathonBot):
         for zone in game_state.map.zones:
             for i in range(zone.height):
                 for j in range(zone.width):
-                    self.pola[zone.y+i][zone.x+j].wsp += wsp_stref
+                    if isinstance(zone, NeutralZone):
+                        self.pola[zone.y+i][zone.x+j].wsp += wsp_stref_neutral
+                    elif isinstance(zone, BeingCapturedZone):
+                        self.pola[zone.y+i][zone.x+j].wsp += wsp_stref_being_captured
+                    elif isinstance(zone, CapturedZone):
+                        self.pola[zone.y+i][zone.x+j].wsp += wsp_stref_captured
+                    elif isinstance(zone, BeingContestedZone):
+                        self.pola[zone.y+i][zone.x+j].wsp += wsp_stref_being_contested
+                    elif isinstance(zone, BeingRetakenZone):
+                        self.pola[zone.y+i][zone.x+j].wsp += wsp_stref_being_retaken
 
         obecny_wsp_podnoszenia = wsp_podnoszenia_przy_pelnym_ekwipunku
         ## zmiana współczynnika za każdy widziany element
@@ -349,6 +364,7 @@ class MyBot(HackathonBot):
                                             if self.pola[poziom-poziom_2][pole].is_wall:
                                                 break
                                             self.pola[poziom-poziom_2][pole].wsp += wsp_obserwowanego_pola
+                                    
                                 ## jeśli w dół
                                 elif entity.turret.direction is Direction.DOWN:
                                     for poziom_2 in range(len(self.pola)):
@@ -356,7 +372,7 @@ class MyBot(HackathonBot):
                                             if self.pola[poziom+poziom_2][pole].is_wall:
                                                 break
                                             self.pola[poziom+poziom_2][pole].wsp += wsp_obserwowanego_pola
-                                            print(poziom+poziom_2,pole,self.pola[poziom+poziom_2][pole].wsp)
+                                            #print(poziom+poziom_2,pole,self.pola[poziom+poziom_2][pole].wsp)
                                 ## jeśli w lewo
                                 elif entity.turret.direction is Direction.LEFT:
                                     for pole_2 in range(len(self.pola)):
@@ -371,7 +387,7 @@ class MyBot(HackathonBot):
                                             if self.pola[poziom][pole+pole_2].is_wall:
                                                 break
                                             self.pola[poziom][pole+pole_2].wsp += wsp_obserwowanego_pola
-                                            print(poziom,pole+pole_2,self.pola[poziom][pole+pole_2].wsp)
+                                            #print(poziom,pole+pole_2,self.pola[poziom][pole+pole_2].wsp)
                         #jeśli nie mamy itema ustawiamy wsp podnoszenia na 1
                         elif isinstance(entity, AgentTank):
                             if entity.secondary_item is None:
@@ -422,6 +438,7 @@ class MyBot(HackathonBot):
 
 
     def __init__(self):
+        self.my_tick = 0
         self.rage = False
         self.secondary_item = None
         self.enemies = list()
