@@ -244,6 +244,8 @@ class MyBot(HackathonBot):
         pass
 
     def next_move(self, game_state: GameState) -> ResponseAction:
+        if game_state.my_agent.is_dead:
+            Pass()
         self.my_tick += 1
 
 
@@ -272,13 +274,23 @@ class MyBot(HackathonBot):
         najwyzszy_wsp_pol *= interpolate(distance(self.my_position, (poziom, pole)), 0, 30, 1, 0.7)
         #t = self.get_directions(self.walkable, (0, 2), (2, 8), 'u')
 
-        if self.counter == 45:
+        if self.counter == 30:
             self.counter = 0
 
         if self.counter == 0:
             self.xv, self.yv = random.randint(1, 21), random.randint(1, 21)
-            if not self.pola[self.xv][self.yv].is_wall:
-                self.counter += 1
+            tils = list()
+            zone = game_state.map.zones[0]
+            for i in range(zone.height):
+                for j in range(zone.width):
+                    tils.append((zone.y + i, zone.x + j))
+            r = random.randint(1, 4)
+            if False:
+                if not self.pola[self.xv][self.yv].is_wall:
+                    self.counter += 1
+            else:
+                self.xv, self.yv = random.choice(tils)
+                print((self.xv, self.yv))
         else:
             self.counter += 1
         self.pola[self.xv][self.yv].wsp += 3
