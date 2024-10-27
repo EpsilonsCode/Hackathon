@@ -23,6 +23,15 @@ wsp_stref = 10
 wsp_rage = 1.5
 wsp_min_score_per_tick_rage = 1
 
+rage_wsp_pola_z_wrogiem = 0.8
+rage_wsp_obserwowanego_pola = -80
+rage_wsp_item_laser = 40
+rage_wsp_item_double_bullet = 20
+rage_wsp_item_mine = 10
+rage_wsp_item_radar = 15
+rage_wsp_item_unknown = -15
+rage_wsp_stref = 30
+
 
 class Pole:
     def __init__(self, x, y):
@@ -374,18 +383,12 @@ class MyBot(HackathonBot):
 
     def sprawdz_czy_wlaczyc_rage(self):
         if game_state.my_agent.score/self.my_tick < wsp_min_score_per_tick_rage:
-            wsp_pola_z_wrogiem /= wsp_rage
-            wsp_obserwowanego_pola /= wsp_rage
-            wsp_item_laser *= wsp_rage
-            wsp_item_double_bullet *= wsp_rage
-            wsp_item_mine *= wsp_rage
-            wsp_item_radar *= wsp_rage
-            wsp_item_unknown *= wsp_rage
-            wsp_stref *= wsp_rage
+            self.rage = True
 
 
 
     def __init__(self):
+        self.rage = False
         self.secondary_item = None
         self.enemies = list()
         self.my_position = tuple()
