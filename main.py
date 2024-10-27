@@ -29,12 +29,24 @@ class Pole:
         self.wsp = 0
         self.is_wall = False
 
+
+
 def get_direction_of_player(position, game_state: GameState):
     return game_state.map.tiles[position[0]][position[1]].entities[0].direction
 
 def get_turret_direction_of_player(position, game_state: GameState):
     return game_state.map.tiles[position[0]][position[1]].entities[0].turret.direction
 
+def convert_to_directions(letter):
+    if letter == 'u':
+        return Direction.UP
+    if letter == 'd':
+        return Direction.DOWN
+    if letter == 'l':
+        return Direction.LEFT
+    if letter == 'r':
+        return Direction.RIGHT
+    return None
 
 def convert_to_letters(direction: Direction):
     if direction is Direction.UP:
@@ -205,7 +217,7 @@ class MyBot(HackathonBot):
         print(convert_to_letters(get_turret_direction_of_player(self.my_position, game_state)))
 
     def ruch_wiezy(self, gamestate):
-        return rotation(get_rotation(self.my_position, find_closest_point(self.enemies, self.my_position)), 'u')
+        return rotation(get_rotation(self.my_position, find_closest_point(self.enemies, self.my_position)), get_turret_direction_of_player(self.my_position, gamestate))
 
     def on_game_ended(self, game_result: GameResult) -> None:
         pass
