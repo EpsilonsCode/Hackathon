@@ -316,30 +316,32 @@ class MyBot(HackathonBot):
                                 if entity.turret.direction is Direction.UP:
                                     for poziom_2 in range(len(self.pola)):
                                         if poziom_2 < poziom:
-                                            self.pola[poziom-poziom_2][pole].wsp += wsp_obserwowanego_pola
                                             if self.pola[poziom-poziom_2][pole].is_wall:
                                                 break
+                                            self.pola[poziom-poziom_2][pole].wsp += wsp_obserwowanego_pola
                                 ## jeśli w dół
                                 elif entity.turret.direction is Direction.DOWN:
                                     for poziom_2 in range(len(self.pola)):
                                         if poziom_2 + poziom < len(self.pola):
-                                            self.pola[poziom+poziom_2][pole].wsp += wsp_obserwowanego_pola
                                             if self.pola[poziom+poziom_2][pole].is_wall:
                                                 break
+                                            self.pola[poziom+poziom_2][pole].wsp += wsp_obserwowanego_pola
+                                            print(poziom+poziom_2,pole,self.pola[poziom+poziom_2][pole].wsp)
                                 ## jeśli w lewo
                                 elif entity.turret.direction is Direction.LEFT:
                                     for pole_2 in range(len(self.pola)):
                                         if pole_2 < pole:
-                                            self.pola[poziom][pole-pole_2].wsp += wsp_obserwowanego_pola
                                             if self.pola[poziom][pole-pole_2].is_wall:
                                                 break
+                                            self.pola[poziom][pole-pole_2].wsp += wsp_obserwowanego_pola
                                 ## jeśli w prawo
                                 elif entity.turret.direction is Direction.RIGHT:
                                     for pole_2 in range(len(self.pola)):
                                         if pole_2 + pole < len(self.pola):
-                                            self.pola[poziom][pole+pole_2].wsp += wsp_obserwowanego_pola
                                             if self.pola[poziom][pole+pole_2].is_wall:
                                                 break
+                                            self.pola[poziom][pole+pole_2].wsp += wsp_obserwowanego_pola
+                                            print(poziom,pole+pole_2,self.pola[poziom][pole+pole_2].wsp)
                         #jeśli nie mamy itema ustawiamy wsp podnoszenia na 1
                         elif isinstance(entity, AgentTank):
                             if entity.secondary_item is None:
