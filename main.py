@@ -161,7 +161,7 @@ class MyBot(HackathonBot):
         return None
 
 
-    def get_directions(self, walls, start, goal):
+    def get_directions(self, walls, start, goal, direction):
 
         directions = list()
         tiles = self.a_star(walls, start, goal)
@@ -205,7 +205,7 @@ class MyBot(HackathonBot):
 
     def next_move(self, game_state: GameState) -> ResponseAction:
         if not self.initialized_walls:
-            #self.initialized_walls = True
+            self.initialized_walls = True
             #self.enemies = list()
             for poziom in range(len(self.pola)):
                 for pole in range(len(self.pola[poziom])):
@@ -219,9 +219,11 @@ class MyBot(HackathonBot):
 
         for poziom in range(len(self.pola)):
             for pole in range(len(self.pola[poziom])):
-                if self.pola[poziom][pole].wsp > najwyzszy_wsp:
+                if self.pola[poziom][pole].wsp > najwyzszy_wsp_pol:
                     najwyzszy_wsp_pol = self.pola[poziom][pole].wsp
                     najlepsze_pole = self.pola[poziom][pole]
+        
+
 
     def ruch_wiezy(self, gamestate):
         return rotation(get_rotation(self.my_position, find_closest_point(self.enemies, self.my_position)), get_turret_direction_of_player(self.my_position, gamestate))
