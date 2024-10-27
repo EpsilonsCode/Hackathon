@@ -241,7 +241,8 @@ class MyBot(HackathonBot):
         pass
 
     def next_move(self, game_state: GameState) -> ResponseAction:
-        self.my_tick += 1
+        #self.my_tick += 1
+
         if not self.initialized_walls:
             self.initialized_walls = True
             #self.enemies = list()
@@ -360,7 +361,6 @@ class MyBot(HackathonBot):
                 if self.pola[poziom][pole].is_wall:
                     continue
                 if game_state.map.tiles[poziom][pole].is_visible:
-                    self.pola[poziom][pole].wsp = -0.1
                     ## wyjęcie wszystkich elementów z danego pola
                     for entity in game_state.map.tiles[poziom][pole].entities:
                         ## jeśli to wróg odejmujemy i patrzymy czy ma wieżę w naszą stornę
@@ -374,22 +374,22 @@ class MyBot(HackathonBot):
                                             if self.pola[poziom-poziom_2][pole].is_wall:
                                                 break
                                             self.pola[poziom-poziom_2][pole].wsp += wsp_obserwowanego_pola
-                                    for poziom_2 in range(len(self.pola)):
-                                        if poziom + poziom_2 < len(self.pola):
-                                            if self.pola[poziom+poziom_2][pole].is_wall:
+                                    for poziom_3 in range(len(self.pola)):
+                                        if poziom + poziom_3 < len(self.pola):
+                                            if self.pola[poziom+poziom_3][pole].is_wall:
                                                 break
-                                            self.pola[poziom+poziom_2][pole].wsp += wsp_nieobserwowanego_pola
+                                            self.pola[poziom+poziom_3][pole].wsp += wsp_nieobserwowanego_pola
                                             #print(poziom+poziom_2,pole,self.pola[poziom+poziom_2][pole].wsp)
                                     for pole_2 in range(len(self.pola)):
                                         if pole-pole_2 >= 0:
                                             if self.pola[poziom][pole-pole_2].is_wall:
                                                 break
                                             self.pola[poziom][pole-pole_2].wsp += wsp_nieobserwowanego_pola/2
-                                    for pole_2 in range(len(self.pola)):
-                                        if pole + pole_2 < len(self.pola):
-                                            if self.pola[poziom][pole+pole_2].is_wall:
+                                    for pole_3 in range(len(self.pola)):
+                                        if pole + pole_3 < len(self.pola):
+                                            if self.pola[poziom][pole+pole_3].is_wall:
                                                 break
-                                            self.pola[poziom][pole+pole_2].wsp += wsp_nieobserwowanego_pola/2
+                                            self.pola[poziom][pole+pole_3].wsp += wsp_nieobserwowanego_pola/2
                                 ## jeśli w dół
                                 elif entity.turret.direction is Direction.DOWN:
                                     for poziom_2 in range(len(self.pola)):
@@ -464,7 +464,7 @@ class MyBot(HackathonBot):
                         elif isinstance(entity, AgentTank):
                             if entity.secondary_item is None:
                                 obecny_wsp_podnoszenia = 1
-                        ## jeśli jest itemem dodajemy wsp mnożony przez współczynnik podnoszenia
+                        # jeśli jest itemem dodajemy wsp mnożony przez współczynnik podnoszenia
                         elif isinstance(entity, Item):
                             #print("test", entity.type)
                             if entity.type == ItemType.LASER:
@@ -487,16 +487,16 @@ class MyBot(HackathonBot):
                             self.pola[poziom][pole].wsp += wsp_laser
                         elif isinstance(entity, Mine):
                             self.pola[poziom][pole].wsp += wsp_mine
-        p = True
-        if p:
-            print("-------------------------------------")
-            for poziom in range(len(self.pola)):
-                for pole in range(len(self.pola[poziom])):
-                    if self.pola[poziom][pole].is_wall:
-                        print("#", end='  ')
-                    else:
-                        print(math.floor(self.pola[poziom][pole].wsp), end='  ')
-                print()
+
+    def show_map(self):
+        print("-------------------------------------")
+        for poziom in range(len(self.pola)):
+            for pole in range(len(self.pola[poziom])):
+                if self.pola[poziom][pole].is_wall:
+                    print("#", end='  ')
+                else:
+                    print(math.floor(self.pola[poziom][pole].wsp), end='  ')
+            print()
 
     def aktualizuj_secondary_item(self, game_state):
         for entity in game_state.map.tiles[self.my_position[0]][self.my_position[1]].entities:
