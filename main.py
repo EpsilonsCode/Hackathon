@@ -12,7 +12,7 @@ wsp_nieobserwowanego_pola = 5
 wsp_pod_graczem = -3
 
 wsp_item_laser = 30
-wsp_item_double_bullet = 15
+wsp_item_double_bullet = 20
 wsp_item_mine = 10
 wsp_item_radar = 15
 wsp_item_unknown = -20
@@ -27,7 +27,7 @@ wsp_podnoszenia_przy_pelnym_ekwipunku = 0.6
 
 wsp_stref_neutral = 6
 wsp_stref_being_captured = 4
-wsp_stref_captured = 3
+wsp_stref_captured = 2.5
 wsp_stref_being_contested = 2
 wsp_stref_being_retaken = 4
 
@@ -36,7 +36,7 @@ wsp_min_score_per_tick_rage = 1
 
 rage_wsp_pola_z_wrogiem = 0.8
 rage_wsp_obserwowanego_pola = -30
-rage_wsp_item_laser = 40
+rage_wsp_item_laser = 50
 rage_wsp_item_double_bullet = 20
 rage_wsp_item_mine = 10
 rage_wsp_item_radar = 15
@@ -598,10 +598,13 @@ class MyBot(HackathonBot):
                             if entity.type == ItemType.UNKNOWN:
                                 self.pola[poziom][pole].wsp += wsp_item_unknown
                         ## jeśli jest jakimś rodzajem pocisku dodajemy ujemny współczynnik
-                        elif isinstance(entity, DoubleBullet):
-                            self.pola[poziom][pole].wsp += wsp_bullet
                         elif isinstance(entity, Bullet):
-                            self.pola[poziom][pole].wsp += wsp_double_bullet
+                            for i in range(-1,2):
+                                for j in range(-1,2):
+                                    self.pola[poziom+i][pole+j].wsp += wsp_bullet*(1/2)
+                            for i in range(-1,2):
+                                for j in range(-1,2):
+                                    self.pola[poziom+i][pole+j].wsp += wsp_double_bullet*(1/2)
                         elif isinstance(entity, Laser):
                             self.pola[poziom][pole].wsp += wsp_laser
                         elif isinstance(entity, Mine):
