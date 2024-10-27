@@ -25,9 +25,9 @@ wsp_wall = -1000
 
 wsp_podnoszenia_przy_pelnym_ekwipunku = 0.6
 
-wsp_stref_neutral = 5
-wsp_stref_being_captured = 5
-wsp_stref_captured = 2.5
+wsp_stref_neutral = 6
+wsp_stref_being_captured = 4
+wsp_stref_captured = 3
 wsp_stref_being_contested = 2
 wsp_stref_being_retaken = 4
 
@@ -248,9 +248,6 @@ class MyBot(HackathonBot):
             Pass()
         self.my_tick += 1
 
-        if game_state.my_agent.is_dead:
-            return Pass()
-
         if not self.initialized_walls:
             self.initialized_walls = True
             #self.enemies = list()
@@ -293,7 +290,7 @@ class MyBot(HackathonBot):
                     self.counter += 1
             else:
                 self.xv, self.yv = random.choice(tils)
-                print((self.xv, self.yv))
+                #print((self.xv, self.yv))
         else:
             self.counter += 1
         self.pola[self.xv][self.yv].wsp += 3
