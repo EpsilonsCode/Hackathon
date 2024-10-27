@@ -212,9 +212,16 @@ class MyBot(HackathonBot):
                     contains_instance = any(isinstance(item, Wall) for item in game_state.map.tiles[poziom][pole].entities)
                     self.pola[poziom][pole].is_wall = contains_instance
 
+        najwyzszy_wsp_pol = self.pola[0][0].wsp
+        najlepsze_pole = self.pola[0][0]
+
         self.przelicz_wszystkie_wspolczyniki_pol(game_state)
-        print(convert_to_letters(get_direction_of_player(self.my_position, game_state)))
-        print(convert_to_letters(get_turret_direction_of_player(self.my_position, game_state)))
+
+        for poziom in range(len(self.pola)):
+            for pole in range(len(self.pola[poziom])):
+                if self.pola[poziom][pole].wsp > najwyzszy_wsp:
+                    najwyzszy_wsp_pol = self.pola[poziom][pole].wsp
+                    najlepsze_pole = self.pola[poziom][pole]
 
     def ruch_wiezy(self, gamestate):
         return rotation(get_rotation(self.my_position, find_closest_point(self.enemies, self.my_position)), get_turret_direction_of_player(self.my_position, gamestate))
