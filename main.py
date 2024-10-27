@@ -20,6 +20,8 @@ wsp_mine = -40
 wsp_wall = -1000
 wsp_podnoszenia_przy_pelnym_ekwipunku = 0.6
 wsp_stref = 10
+wsp_rage = 1.5
+wsp_min_score_per_tick_rage = 1
 
 
 class Pole:
@@ -369,6 +371,19 @@ class MyBot(HackathonBot):
         for entity in game_state.map.tiles[self.my_position[0]][self.my_position[1]].entities:
             if isinstance(entity, AgentTank):
                 self.secondary_item = entity.secondary_item
+
+    def sprawdz_czy_wlaczyc_rage(self):
+        if game_state.my_agent.score/self.my_tick < wsp_min_score_per_tick_rage:
+            wsp_pola_z_wrogiem /= wsp_rage
+            wsp_obserwowanego_pola /= wsp_rage
+            wsp_item_laser *= wsp_rage
+            wsp_item_double_bullet *= wsp_rage
+            wsp_item_mine *= wsp_rage
+            wsp_item_radar *= wsp_rage
+            wsp_item_unknown *= wsp_rage
+            wsp_stref *= wsp_rage
+
+
 
     def __init__(self):
         self.secondary_item = None
