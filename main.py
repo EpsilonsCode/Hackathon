@@ -181,7 +181,7 @@ class MyBot(HackathonBot):
                 (current[0], current[1] - 1)
             ]
 
-            for neighbor in neighbors:
+            for neighself.pola[zone.y+i][zone.x+j]bor in neighbors:
                 if 0 <= neighbor[0] < rows and 0 <= neighbor[1] < cols and walls[neighbor[0]][neighbor[1]] == 0:
                     tentative_g_score = g_score[current] + 1
                     if neighbor not in g_score or tentative_g_score < g_score[neighbor]:
