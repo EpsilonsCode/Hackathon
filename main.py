@@ -27,8 +27,8 @@ wsp_podnoszenia_przy_pelnym_ekwipunku = 0.6
 
 wsp_stref = 3
 wsp_stref_neutral = 3
-wsp_stref_being_captured = 2.5
-wsp_stref_captured = 2
+wsp_stref_being_captured = 4
+wsp_stref_captured = 2.5
 wsp_stref_being_contested = 2
 wsp_stref_being_retaken = 2
 
@@ -247,7 +247,7 @@ class MyBot(HackathonBot):
     def next_move(self, game_state: GameState) -> ResponseAction:
         self.my_tick += 1
 
-        if self.my_tick % 100 == 0:
+        if self.my_tick % 1000 == 0:
             self.show_map()
 
         if not self.initialized_walls:
@@ -266,12 +266,12 @@ class MyBot(HackathonBot):
             return Rotation(None, RotationDirection.RIGHT)
         for poziom in range(len(self.pola)):
             for pole in range(len(self.pola[poziom])):
-                if self.pola[poziom][pole].wsp * interpolate(distance(self.my_position, (poziom, pole)), 0, 30, 1, 0.8) > najwyzszy_wsp_pol:
+                if self.pola[poziom][pole].wsp * interpolate(distance(self.my_position, (poziom, pole)), 0, 30, 1, 0.7) > najwyzszy_wsp_pol:
                     najwyzszy_wsp_pol = self.pola[poziom][pole].wsp
                     najlepsze_pole = self.pola[poziom][pole]
-        najwyzszy_wsp_pol *= interpolate(distance(self.my_position, (poziom, pole)), 0, 30, 1, 0.8)
+        najwyzszy_wsp_pol *= interpolate(distance(self.my_position, (poziom, pole)), 0, 30, 1, 0.7)
         t = self.get_directions(self.walkable, (0, 2), (2, 8), 'u')
-        if self.counter == 35:
+        if self.counter == 20:
             self.counter = 0
 
         if self.counter == 0:
@@ -280,8 +280,13 @@ class MyBot(HackathonBot):
                 self.counter += 1
         else:
             self.counter += 1
-        self.pola[self.xv][self.yv].wsp = 10
+        self.pola[self.xv][self.yv].wsp += 3
+        #if self.counter < 30:
         dirs = self.get_directions(self.walkable, (self.my_position[0], self.my_position[1]), (self.xv, self.yv), convert_to_letters(get_direction_of_player(self.my_position, game_state)))
+        #else:
+            #dirs = self.get_directions(self.walkable, (self.my_position[0], self.my_position[1]), (najwyzszy_wsp_pol.x, najwyzszy_wsp_pol.y),
+         #                              convert_to_letters(get_direction_of_player(self.my_position, game_state)))
+
         action = self.action_coefficient(game_state, najwyzszy_wsp_pol)
         if action is not None:
             return action
