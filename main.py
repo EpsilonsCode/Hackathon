@@ -7,7 +7,7 @@ from test import find_closest_point
 wsp_wygasania_niewidocznych = 0.8
 wsp_poczatkowy_widocznych = 1
 wsp_pola_z_wrogiem = -5
-wsp_obserwowanego_pola = -10
+wsp_obserwowanego_pola = -100
 wsp_item_laser = 20
 wsp_item_double_bullet = 10
 wsp_item_mine = 5
@@ -216,14 +216,23 @@ class MyBot(HackathonBot):
         najlepsze_pole = self.pola[0][0]
 
         self.przelicz_wszystkie_wspolczyniki_pol(game_state)
-
+        print(self.my_position)
         for poziom in range(len(self.pola)):
             for pole in range(len(self.pola[poziom])):
                 if self.pola[poziom][pole].wsp > najwyzszy_wsp_pol:
                     najwyzszy_wsp_pol = self.pola[poziom][pole].wsp
                     najlepsze_pole = self.pola[poziom][pole]
         
-    def
+    def action_coefficient(self, game_state: GameState):
+        if self.secondary_item is ItemType.MINE:
+            return 50
+        if self.secondary_item is ItemType.RADAR:
+            return 50
+        if self.secondary_item is ItemType.LASER:
+
+            pass
+
+        pass
 
     def ruch_wiezy(self, gamestate):
         return rotation(get_rotation(self.my_position, find_closest_point(self.enemies, self.my_position)), get_turret_direction_of_player(self.my_position, gamestate))
@@ -281,42 +290,44 @@ class MyBot(HackathonBot):
         for poziom in range(len(self.pola)):
             for pole in range(len(self.pola[poziom])):
                 if self.pola[poziom][pole].is_wall:
-                    break
+                    continue
                 if game_state.map.tiles[poziom][pole].is_visible:
+                    self.pola[poziom][pole].wsp = 0
                     ## wyjęcie wszystkich elementów z danego pola
                     for entity in game_state.map.tiles[poziom][pole].entities:
                         ## jeśli to wróg odejmujemy i patrzymy czy ma wieżę w naszą stornę
                         if isinstance(entity, PlayerTank):
-                            print("tank", entity)
                             if entity.owner_id != game_state.my_agent.id:
+                                #print("test")
+                                print("tank", entity)
                                 self.pola[poziom][pole].wsp += wsp_pola_z_wrogiem
                                 ## jeśli go góry
                                 if entity.turret.direction is Direction.UP:
                                     for poziom_2 in range(len(self.pola)):
                                         if poziom_2 < poziom:
-                                            self.pola[poziom_2][pole].wsp += wsp_obserwowanego_pola
-                                            if self.pola[poziom_2][pole].is_wall:
+                                            self.pola[poziom-poziom_2][pole].wsp += wsp_obserwowanego_pola
+                                            if self.pola[poziom-poziom_2][pole].is_wall:
                                                 break
                                 ## jeśli w dół
                                 elif entity.turret.direction is Direction.DOWN:
                                     for poziom_2 in range(len(self.pola)):
                                         if poziom_2 > poziom:
-                                            self.pola[poziom_2][pole].wsp += wsp_obserwowanego_pola
-                                            if self.pola[poziom_2][pole].is_wall:
+                                            self.pola[poziom+poziom_2][pole].wsp += wsp_obserwowanego_pola
+                                            if self.pola[poziom+poziom_2][pole].is_wall:
                                                 break
                                 ## jeśli w lewo
                                 elif entity.turret.direction is Direction.LEFT:
                                     for pole_2 in range(len(self.pola)):
                                         if pole_2 < pole:
-                                            self.pola[poziom][pole_2].wsp += wsp_obserwowanego_pola
-                                            if self.pola[poziom][pole_2].is_wall:
+                                            self.pola[poziom][pole-pole_2].wsp += wsp_obserwowanego_pola
+                                            if self.pola[poziom][pole-pole_2].is_wall:
                                                 break
                                 ## jeśli w prawo
                                 elif entity.turret.direction is Direction.RIGHT:
                                     for pole_2 in range(len(self.pola)):
                                         if pole_2 > pole:
-                                            self.pola[poziom][pole_2].wsp += wsp_obserwowanego_pola
-                                            if self.pola[poziom][pole_2].is_wall:
+                                            self.pola[poziom][pole+pole_2].wsp += wsp_obserwowanego_pola
+                                            if self.pola[poziom][pole+pole_2].is_wall:
                                                 break
                         #jeśli nie mamy itema ustawiamy wsp podnoszenia na 1
                         elif isinstance(entity, AgentTank):
@@ -343,16 +354,16 @@ class MyBot(HackathonBot):
                             self.pola[poziom][pole].wsp += wsp_laser
                         elif isinstance(entity, Mine):
                             self.pola[poziom][pole].wsp += wsp_mine
-
-        # print("-------------------------------------")
-        # for poziom in range(len(self.pola)):
-        #     for pole in range(len(self.pola[poziom])):
-        #         if self.pola[poziom][pole].is_wall:
-        #             print("#", end='  ')
-        #         else:
-        #             print(math.floor(self.pola[poziom][pole].wsp), end='  ')
-        #     print()
-        #
+        p = True
+        if p:
+            print("-------------------------------------")
+            for poziom in range(len(self.pola)):
+                for pole in range(len(self.pola[poziom])):
+                    if self.pola[poziom][pole].is_wall:
+                        print("#", end='  ')
+                    else:
+                        print(math.floor(self.pola[poziom][pole].wsp), end='  ')
+                print()
 
     def aktualizuj_secondary_item(self, game_state):
         for entity in game_state.map.tiles[self.my_position[0]][self.my_position[1]].entities:
