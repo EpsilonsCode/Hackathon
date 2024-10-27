@@ -263,8 +263,8 @@ class MyBot(HackathonBot):
         najlepsze_pole = self.pola[0][0]
 
 
-        #if self.my_tick % 30 == 0:
-        #    self.show_map()
+        if self.my_tick % 1000 == 0:
+            self.show_map()
 
         self.przelicz_wszystkie_wspolczyniki_pol(game_state)
         if get_direction_of_player(self.my_position, game_state) is not get_turret_direction_of_player(self.my_position, game_state):
