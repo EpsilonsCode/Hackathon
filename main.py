@@ -294,7 +294,7 @@ class MyBot(HackathonBot):
                 if self.pola[poziom][pole].is_wall:
                     continue
                 if game_state.map.tiles[poziom][pole].is_visible:
-                    self.pola[poziom][pole].wsp = 0
+                    self.pola[poziom][pole].wsp = -0.1
                     ## wyjęcie wszystkich elementów z danego pola
                     for entity in game_state.map.tiles[poziom][pole].entities:
                         ## jeśli to wróg odejmujemy i patrzymy czy ma wieżę w naszą stornę
@@ -313,7 +313,7 @@ class MyBot(HackathonBot):
                                 ## jeśli w dół
                                 elif entity.turret.direction is Direction.DOWN:
                                     for poziom_2 in range(len(self.pola)):
-                                        if poziom_2 > poziom:
+                                        if poziom_2 + poziom < len(self.pola):
                                             self.pola[poziom+poziom_2][pole].wsp += wsp_obserwowanego_pola
                                             if self.pola[poziom+poziom_2][pole].is_wall:
                                                 break
@@ -327,7 +327,7 @@ class MyBot(HackathonBot):
                                 ## jeśli w prawo
                                 elif entity.turret.direction is Direction.RIGHT:
                                     for pole_2 in range(len(self.pola)):
-                                        if pole_2 > pole:
+                                        if pole_2 + pole < len(self.pola):
                                             self.pola[poziom][pole+pole_2].wsp += wsp_obserwowanego_pola
                                             if self.pola[poziom][pole+pole_2].is_wall:
                                                 break
