@@ -255,8 +255,12 @@ class MyBot(HackathonBot):
                 if self.pola[poziom][pole].wsp * interpolate(distance(self.my_position, (poziom, pole)), 0, 30, 1, 0.5) > najwyzszy_wsp_pol:
                     najwyzszy_wsp_pol = self.pola[poziom][pole].wsp
                     najlepsze_pole = self.pola[poziom][pole]
+        najwyzszy_wsp_pol *= interpolate(distance(self.my_position, (poziom, pole)), 0, 30, 1, 0.5)
         t = self.get_directions(self.walkable, (0, 2), (2, 8), 'u')
         dirs = self.get_directions(self.walkable, (self.my_position[0], self.my_position[1]), (najlepsze_pole.x, najlepsze_pole.y), convert_to_letters(get_direction_of_player(self.my_position, game_state)))
+        action = self.action_coefficient(game_state, najwyzszy_wsp_pol)
+        if action is not None:
+            return action
         #print("my position:", (self.my_position[0], self.my_position[1]))
         #print("best position:", (najlepsze_pole.y, najlepsze_pole.x))
         #print("dir:", convert_to_letters(get_direction_of_player(self.my_position, game_state)))
@@ -284,9 +288,10 @@ class MyBot(HackathonBot):
             return Movement(MovementDirection.FORWARD)
 
 
-    def action_coefficient(self, game_state: GameState):
+    def action_coefficient(self, game_state: GameState, best_tile):
         if self.secondary_item is ItemType.MINE:
-            return 50
+            if best_tile < 50:
+                return AbilityUse(Ability.DROP_MINE)
         if self.secondary_item is ItemType.RADAR:
             return 50
         if self.secondary_item is ItemType.LASER:
@@ -309,7 +314,12 @@ class MyBot(HackathonBot):
         self.enemies = list()
         for poziom in range(len(self.pola)):
             for pole in range(len(self.pola[poziom])):
-                contains_instance = any(isinstance(item, (Wall, Bullet, DoubleBullet, Laser, Mine, PlayerTank)) for item in game_state.map.tiles[poziom][pole].entities)
+                contains_instance = False
+                try:
+                    contains_instance = any(isinstance(item, (Wall, Bullet, DoubleBullet, Laser, Mine, PlayerTank)) for item in game_state.map.tiles[poziom][pole].entities)
+                except IndexError:
+                    print("Index out of range for row:", poziom, "and column:", pole)
+                    contains_instance = False
                 if contains_instance:
                     self.walkable[poziom][pole] = 1
                 contains_instance = any(
