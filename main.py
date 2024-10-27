@@ -181,7 +181,7 @@ class MyBot(HackathonBot):
                 (current[0], current[1] - 1)
             ]
 
-            for neighbor in neighbors:
+            for neighself.pola[zone.y+i][zone.x+j]bor in neighbors:
                 if 0 <= neighbor[0] < rows and 0 <= neighbor[1] < cols and walls[neighbor[0]][neighbor[1]] == 0:
                     tentative_g_score = g_score[current] + 1
                     if neighbor not in g_score or tentative_g_score < g_score[neighbor]:
@@ -260,8 +260,8 @@ class MyBot(HackathonBot):
         najlepsze_pole = self.pola[0][0]
 
 
-        if self.my_tick % 1000 == 0:
-            self.show_map()
+        #if self.my_tick % 1000 == 0:
+        #    self.show_map()
 
         self.przelicz_wszystkie_wspolczyniki_pol(game_state)
         if get_direction_of_player(self.my_position, game_state) is not get_turret_direction_of_player(self.my_position, game_state):
