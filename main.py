@@ -31,7 +31,14 @@ class Pole:
         self.wsp = 0
         self.is_wall = False
 
+import math
 
+def interpolate(value, range_start, range_end, target_start, target_end):
+    ratio = (value - range_start) / (range_end - range_start)
+    return target_start + ratio * (target_end - target_start)
+
+def distance(point1, point2):
+    return math.sqrt((point2[0] - point1[0]) ** 2 + (point2[1] - point1[1]) ** 2)
 
 def get_direction_of_player(position, game_state: GameState):
     return game_state.map.tiles[position[0]][position[1]].entities[0].direction
@@ -221,7 +228,7 @@ class MyBot(HackathonBot):
         print(self.my_position)
         for poziom in range(len(self.pola)):
             for pole in range(len(self.pola[poziom])):
-                if self.pola[poziom][pole].wsp > najwyzszy_wsp_pol:
+                if self.pola[poziom][pole].wsp * interpolate(distance(self.my_position, (poziom, pole)), 0, 30, 1, 0.5) > najwyzszy_wsp_pol:
                     najwyzszy_wsp_pol = self.pola[poziom][pole].wsp
                     najlepsze_pole = self.pola[poziom][pole]
         
@@ -304,6 +311,8 @@ class MyBot(HackathonBot):
                                 print("tank", entity)
                                 self.pola[poziom][pole].wsp += wsp_pola_z_wrogiem
                                 ## jeśli go góry
+                                print(entity.turret.direction is Direction.RIGHT)
+                                print(entity.turret.direction == Direction.RIGHT)
                                 if entity.turret.direction is Direction.UP:
                                     for poziom_2 in range(len(self.pola)):
                                         if poziom_2 < poziom:
@@ -350,9 +359,9 @@ class MyBot(HackathonBot):
                             if entity.type == ItemType.UNKNOWN:
                                 self.pola[poziom][pole].wsp += wsp_item_unknown
                         ## jeśli jest jakimś rodzajem pocisku dodajemy ujemny współczynnik
-                        elif isinstance(entity, Bullet):
-                            self.pola[poziom][pole].wsp += wsp_bullet
                         elif isinstance(entity, DoubleBullet):
+                            self.pola[poziom][pole].wsp += wsp_bullet
+                        elif isinstance(entity, Bullet):
                             self.pola[poziom][pole].wsp += wsp_double_bullet
                         elif isinstance(entity, Laser):
                             self.pola[poziom][pole].wsp += wsp_laser
