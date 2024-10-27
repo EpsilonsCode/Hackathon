@@ -267,7 +267,7 @@ class MyBot(HackathonBot):
                     najlepsze_pole = self.pola[poziom][pole]
         najwyzszy_wsp_pol *= interpolate(distance(self.my_position, (poziom, pole)), 0, 30, 1, 0.8)
         t = self.get_directions(self.walkable, (0, 2), (2, 8), 'u')
-        if self.counter == 15:
+        if self.counter == 35:
             self.counter = 0
 
         if self.counter == 0:
@@ -276,7 +276,7 @@ class MyBot(HackathonBot):
                 self.counter += 1
         else:
             self.counter += 1
-        self.pola[self.xv][self.yv].wsp = 100
+        self.pola[self.xv][self.yv].wsp = 10
         dirs = self.get_directions(self.walkable, (self.my_position[0], self.my_position[1]), (self.xv, self.yv), convert_to_letters(get_direction_of_player(self.my_position, game_state)))
         action = self.action_coefficient(game_state, najwyzszy_wsp_pol)
         if action is not None:
