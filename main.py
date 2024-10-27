@@ -354,7 +354,13 @@ class MyBot(HackathonBot):
         #     print()
         #
 
+    def aktualizuj_secondary_item(self, game_state):
+        for entity in game_state.map.tiles[self.my_position[0]][self.my_position[1]].entities:
+            if isinstance(entity, AgentTank):
+                self.secondary_item = entity.secondary_item
+
     def __init__(self):
+        self.secondary_item = None
         self.enemies = list()
         self.my_position = tuple()
         self.initialized_walls = False
