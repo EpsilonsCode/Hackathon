@@ -215,6 +215,7 @@ class MyBot(HackathonBot):
         pass
 
     def next_move(self, game_state: GameState) -> ResponseAction:
+        self.my_tick += 1
         if not self.initialized_walls:
             self.initialized_walls = True
             #self.enemies = list()
@@ -392,6 +393,7 @@ class MyBot(HackathonBot):
 
 
     def __init__(self):
+        self.my_tick = 0
         self.rage = False
         self.secondary_item = None
         self.enemies = list()
