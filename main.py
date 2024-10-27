@@ -337,15 +337,17 @@ class MyBot(HackathonBot):
                                 obecny_wsp_podnoszenia = 1
                         ## jeśli jest itemem dodajemy wsp mnożony przez współczynnik podnoszenia
                         elif isinstance(entity, Item):
-                            if entity.type is ItemType.LASER:
+                            #print("test", entity.type)
+                            if entity.type == ItemType.LASER:
                                 self.pola[poziom][pole].wsp += wsp_item_laser*obecny_wsp_podnoszenia
-                            if entity.type is ItemType.DOUBLE_BULLET:
+                            if entity.type == ItemType.DOUBLE_BULLET:
                                 self.pola[poziom][pole].wsp += wsp_item_double_bullet*obecny_wsp_podnoszenia
-                            if entity.type is ItemType.MINE:
+                            if entity.type == ItemType.MINE:
                                 self.pola[poziom][pole].wsp += wsp_item_mine*obecny_wsp_podnoszenia
-                            if entity.type is ItemType.RADAR:
-                                self.pola[poziom][pole].wsp += wsp_item_radar*obecny_wsp_podnoszenia
-                            if entity.type is ItemType.UNKNOWN:
+                            if entity.type == ItemType.RADAR:
+                                #print(wsp_item_radar*obecny_wsp_podnoszenia)
+                                self.pola[poziom][pole].wsp += wsp_item_radar*obecny_wsp_podnoszenia + 1000
+                            if entity.type == ItemType.UNKNOWN:
                                 self.pola[poziom][pole].wsp += wsp_item_unknown
                         ## jeśli jest jakimś rodzajem pocisku dodajemy ujemny współczynnik
                         elif isinstance(entity, Bullet):
@@ -372,7 +374,7 @@ class MyBot(HackathonBot):
             if isinstance(entity, AgentTank):
                 self.secondary_item = entity.secondary_item
 
-    def sprawdz_czy_wlaczyc_rage(self):
+    def sprawdz_czy_wlaczyc_rage(self, game_state: GameState):
         if game_state.my_agent.score/self.my_tick < wsp_min_score_per_tick_rage:
             wsp_pola_z_wrogiem /= wsp_rage
             wsp_obserwowanego_pola /= wsp_rage
