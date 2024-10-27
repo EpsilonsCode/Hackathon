@@ -246,8 +246,9 @@ class MyBot(HackathonBot):
     def next_move(self, game_state: GameState) -> ResponseAction:
         self.my_tick += 1
 
-        if self.my_tick % 30 == 0:
-            self.show_map()
+
+        #if self.my_tick % 1000 == 0:
+        #    self.show_map()
 
         if not self.initialized_walls:
             self.initialized_walls = True
