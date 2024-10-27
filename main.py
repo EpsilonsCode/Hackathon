@@ -2,7 +2,6 @@ import heapq
 import math
 
 from hackathon_bot import *
-from test import find_closest_point
 
 wsp_wygasania_niewidocznych = 0.8
 wsp_poczatkowy_widocznych = 1
@@ -52,6 +51,9 @@ class Pole:
         self.is_wall = False
 
 import math
+
+def add_vectors(a, b):
+    return tuple(map(lambda x, y: x + y, a, b))
 
 def interpolate(value, range_start, range_end, target_start, target_end):
     ratio = (value - range_start) / (range_end - range_start)
@@ -293,16 +295,98 @@ class MyBot(HackathonBot):
 
 
     def action_coefficient(self, game_state: GameState, best_tile):
-        if self.secondary_item is ItemType.MINE:
-            if best_tile < 50:
-                return AbilityUse(Ability.DROP_MINE)
-        if self.secondary_item is ItemType.RADAR:
-            return 50
-        if self.secondary_item is ItemType.LASER:
+        if self.secondary_item is SecondaryItemType.MINE:
+            return AbilityUse(Ability.DROP_MINE)
+        if self.secondary_item is SecondaryItemType.RADAR:
+            return AbilityUse(Ability.USE_RADAR)
+        if self.secondary_item is SecondaryItemType.LASER:
+            d = get_turret_direction_of_player(self.my_position, game_state)
+            pos = self.my_position
+            x1, y1 = pos
+            if d == Direction.UP:
+                for x in range(self.my_position[0], 0, -1):
+                    if self.pola[x][y1].is_wall:
+                        break
+                    if (x, y1) in self.enemies:
+                        return AbilityUse(Ability.USE_LASER)
+            if d == Direction.DOWN:
+                for x in range(self.my_position[0], 21, 1):
+                    if self.pola[x][y1].is_wall:
+                        break
+                    if (x, y1) in self.enemies:
+                        return AbilityUse(Ability.USE_LASER)
+            if d == Direction.LEFT:
+                for y in range(self.my_position[0], 0, -1):
+                    if self.pola[x1][y].is_wall:
+                        break
+                    if (x1, y) in self.enemies:
+                        return AbilityUse(Ability.USE_LASER)
+            if d == Direction.RIGHT:
+                for y in range(self.my_position[0], 21, 1):
+                    if self.pola[x1][y].is_wall:
+                        break
+                    if (x1, y) in self.enemies:
+                        return AbilityUse(Ability.USE_LASER)
+        if self.secondary_item is SecondaryItemType.DOUBLE_BULLET:
+            d = get_turret_direction_of_player(self.my_position, game_state)
+            pos = self.my_position
+            x1, y1 = pos
+            if d == Direction.UP:
+                for x in range(self.my_position[0], 0, -1):
+                    if self.pola[x][y1].is_wall:
+                        break
+                    if (x, y1) in self.enemies:
+                        return AbilityUse(Ability.FIRE_DOUBLE_BULLET)
+            if d == Direction.DOWN:
+                for x in range(self.my_position[0], 21, 1):
+                    if self.pola[x][y1].is_wall:
+                        break
+                    if (x, y1) in self.enemies:
+                        return AbilityUse(Ability.FIRE_DOUBLE_BULLET)
+            if d == Direction.LEFT:
+                for y in range(self.my_position[0], 0, -1):
+                    if self.pola[x1][y].is_wall:
+                        break
+                    if (x1, y) in self.enemies:
+                        return AbilityUse(Ability.FIRE_DOUBLE_BULLET)
+            if d == Direction.RIGHT:
+                for y in range(self.my_position[0], 21, 1):
+                    if self.pola[x1][y].is_wall:
+                        break
+                    if (x1, y) in self.enemies:
+                        return AbilityUse(Ability.FIRE_DOUBLE_BULLET)
+        if self.secondary_item is None or game_state.map.tiles[self.my_position[0]][self.my_position[1]].entities[0].turret.bullet_count > 0:
+            d = get_turret_direction_of_player(self.my_position, game_state)
+            pos = self.my_position
+            x1, y1 = pos
+            if d == Direction.UP:
+                for x in range(self.my_position[0], 0, -1):
+                    if self.pola[x][y1].is_wall:
+                        break
+                    if (x, y1) in self.enemies:
+                        return AbilityUse(Ability.FIRE_BULLET)
+            if d == Direction.DOWN:
+                for x in range(self.my_position[0], 21, 1):
+                    if self.pola[x][y1].is_wall:
+                        break
+                    if (x, y1) in self.enemies:
+                        return AbilityUse(Ability.FIRE_BULLET)
+            if d == Direction.LEFT:
+                for y in range(self.my_position[0], 0, -1):
+                    if self.pola[x1][y].is_wall:
+                        break
+                    if (x1, y) in self.enemies:
+                        return AbilityUse(Ability.FIRE_BULLET)
+            if d == Direction.RIGHT:
+                for y in range(self.my_position[0], 21, 1):
+                    if self.pola[x1][y].is_wall:
+                        break
+                    if (x1, y) in self.enemies:
+                        return AbilityUse(Ability.FIRE_BULLET)
 
-            pass
+        return None
 
-        pass
+
 
     def ruch_wiezy(self, gamestate):
         return rotation(get_rotation(self.my_position, find_closest_point(self.enemies, self.my_position)), get_turret_direction_of_player(self.my_position, gamestate))
