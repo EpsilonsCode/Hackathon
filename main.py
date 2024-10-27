@@ -7,7 +7,8 @@ from test import find_closest_point
 wsp_wygasania_niewidocznych = 0.8
 wsp_poczatkowy_widocznych = 1
 wsp_pola_z_wrogiem = -5
-wsp_obserwowanego_pola = -10
+wsp_obserwowanego_pola = -100
+wsp_nieobserwowanego_pola = 20
 wsp_item_laser = 20
 wsp_item_double_bullet = 10
 wsp_item_mine = 5
@@ -365,11 +366,15 @@ class MyBot(HackathonBot):
                                 ## jeśli go góry
                                 if entity.turret.direction is Direction.UP:
                                     for poziom_2 in range(len(self.pola)):
-                                        if poziom_2 < poziom:
+                                        if poziom - poziom_2 >= 0:
                                             if self.pola[poziom-poziom_2][pole].is_wall:
                                                 break
                                             self.pola[poziom-poziom_2][pole].wsp += wsp_obserwowanego_pola
-                                    
+                                    for poziom_2 in range(len(self.pola)):
+                                        if poziom + poziom_2 < len(self.pola):
+                                            if self.pola[poziom+poziom_2][pole].is_wall:
+                                                break
+                                            self.pola[poziom+poziom_2][pole].wsp += wsp_nieobserwowanego_pola
                                 ## jeśli w dół
                                 elif entity.turret.direction is Direction.DOWN:
                                     for poziom_2 in range(len(self.pola)):
@@ -378,13 +383,23 @@ class MyBot(HackathonBot):
                                                 break
                                             self.pola[poziom+poziom_2][pole].wsp += wsp_obserwowanego_pola
                                             #print(poziom+poziom_2,pole,self.pola[poziom+poziom_2][pole].wsp)
+                                    for poziom_2 in range(len(self.pola)):
+                                        if poziom - poziom_2 > 0:
+                                            if self.pola[poziom-poziom_2][pole].is_wall:
+                                                break
+                                            self.pola[poziom-poziom_2][pole].wsp += wsp_nieobserwowanego_pola
                                 ## jeśli w lewo
                                 elif entity.turret.direction is Direction.LEFT:
                                     for pole_2 in range(len(self.pola)):
-                                        if pole_2 < pole:
+                                        if pole-pole_2 >= 0:
                                             if self.pola[poziom][pole-pole_2].is_wall:
                                                 break
                                             self.pola[poziom][pole-pole_2].wsp += wsp_obserwowanego_pola
+                                    for pole_2 in range(len(self.pola)):
+                                        if pole + pole_2 < len(self.pola):
+                                            if self.pola[poziom][pole+pole_2].is_wall:
+                                                break
+                                            self.pola[poziom][pole+pole_2].wsp += wsp_nieobserwowanego_pola
                                 ## jeśli w prawo
                                 elif entity.turret.direction is Direction.RIGHT:
                                     for pole_2 in range(len(self.pola)):
@@ -393,6 +408,11 @@ class MyBot(HackathonBot):
                                                 break
                                             self.pola[poziom][pole+pole_2].wsp += wsp_obserwowanego_pola
                                             #print(poziom,pole+pole_2,self.pola[poziom][pole+pole_2].wsp)
+                                    for pole_2 in range(len(self.pola)):
+                                        if pole - pole_2 > 0:
+                                            if self.pola[poziom][pole-pole_2].is_wall:
+                                                break
+                                            self.pola[poziom][pole-pole_2].wsp += wsp_nieobserwowanego_pola
                         #jeśli nie mamy itema ustawiamy wsp podnoszenia na 1
                         elif isinstance(entity, AgentTank):
                             if entity.secondary_item is None:
