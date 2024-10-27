@@ -19,12 +19,12 @@ wsp_laser = -80
 wsp_mine = -40
 wsp_wall = -1000
 wsp_podnoszenia_przy_pelnym_ekwipunku = 0.6
-wsp_stref = 10
-wsp_stref_neutral = 15
-wsp_stref_being_captured = 20
-wsp_stref_captured = 10
-wsp_stref_being_contested = 10
-wsp_stref_being_retaken = 15
+wsp_stref = 1.0
+wsp_stref_neutral = 1.5
+wsp_stref_being_captured = 2.0
+wsp_stref_captured = 1.0
+wsp_stref_being_contested = 1.0
+wsp_stref_being_retaken = 1.5
 wsp_rage = 1.5
 wsp_min_score_per_tick_rage = 1
 
@@ -254,23 +254,28 @@ class MyBot(HackathonBot):
                 if self.pola[poziom][pole].wsp * interpolate(distance(self.my_position, (poziom, pole)), 0, 30, 1, 0.5) > najwyzszy_wsp_pol:
                     najwyzszy_wsp_pol = self.pola[poziom][pole].wsp
                     najlepsze_pole = self.pola[poziom][pole]
-        dirs = self.get_directions(self.walkable, self.my_position, (najlepsze_pole.x, najlepsze_pole.y), convert_to_letters(get_direction_of_player(self.my_position, game_state)))
+        t = self.get_directions(self.walkable, (0, 2), (2, 8), 'u')
+        dirs = self.get_directions(self.walkable, (self.my_position[0], self.my_position[1]), (najlepsze_pole.x, najlepsze_pole.y), convert_to_letters(get_direction_of_player(self.my_position, game_state)))
+        #print("my position:", (self.my_position[0], self.my_position[1]))
+        #print("best position:", (najlepsze_pole.y, najlepsze_pole.x))
+        #print("dir:", convert_to_letters(get_direction_of_player(self.my_position, game_state)))
+        #print(t)
         #print(self.ruch_wiezy(game_state))
         #print(dirs[1])
         #print(dirs)
-        print(dirs)
-        print(self.my_position)
-        print((najlepsze_pole.x, najlepsze_pole.y))
+        #print(dirs)
+        #print(self.my_position)
+        #print((najlepsze_pole.x, najlepsze_pole.y))
         if dirs is None:
             return Pass()
         if len(dirs) < 1:
             return Pass()
 
-        print(dirs)
-        print(dirs[1])
+        #print(dirs)
+        #print(dirs[1])
+
 
         if dirs[1] == 'e':
-            print()
             return Rotation(RotationDirection.RIGHT, RotationDirection.RIGHT)
         elif dirs[1] == 'q':
             return Rotation(RotationDirection.LEFT, RotationDirection.LEFT)
