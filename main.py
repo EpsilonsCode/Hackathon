@@ -1,5 +1,6 @@
 import heapq
 import math
+import random
 
 from hackathon_bot import *
 
@@ -261,35 +262,34 @@ class MyBot(HackathonBot):
         najlepsze_pole = self.pola[0][0]
 
         self.przelicz_wszystkie_wspolczyniki_pol(game_state)
-
+        if get_direction_of_player(self.my_position, game_state) is not get_turret_direction_of_player(self.my_position, game_state):
+            return Rotation(None, RotationDirection.RIGHT)
         for poziom in range(len(self.pola)):
             for pole in range(len(self.pola[poziom])):
                 if self.pola[poziom][pole].wsp * interpolate(distance(self.my_position, (poziom, pole)), 0, 30, 1, 0.8) > najwyzszy_wsp_pol:
                     najwyzszy_wsp_pol = self.pola[poziom][pole].wsp
                     najlepsze_pole = self.pola[poziom][pole]
-        najwyzszy_wsp_pol *= interpolate(distance(self.my_position, (poziom, pole)), 0, 30, 1, 0.5)
+        najwyzszy_wsp_pol *= interpolate(distance(self.my_position, (poziom, pole)), 0, 30, 1, 0.8)
         t = self.get_directions(self.walkable, (0, 2), (2, 8), 'u')
-        dirs = self.get_directions(self.walkable, (self.my_position[0], self.my_position[1]), (najlepsze_pole.x, najlepsze_pole.y), convert_to_letters(get_direction_of_player(self.my_position, game_state)))
+        if self.counter == 15:
+            self.counter = 0
+
+        if self.counter == 0:
+            self.xv, self.yv = random.randint(1, 21), random.randint(1, 21)
+            if not self.pola[self.xv][self.yv].is_wall:
+                self.counter += 1
+        else:
+            self.counter += 1
+        self.pola[self.xv][self.yv].wsp = 100
+        dirs = self.get_directions(self.walkable, (self.my_position[0], self.my_position[1]), (self.xv, self.yv), convert_to_letters(get_direction_of_player(self.my_position, game_state)))
         action = self.action_coefficient(game_state, najwyzszy_wsp_pol)
         if action is not None:
             return action
-        #print("my position:", (self.my_position[0], self.my_position[1]))
-        #print("best position:", (najlepsze_pole.y, najlepsze_pole.x))
-        #print("dir:", convert_to_letters(get_direction_of_player(self.my_position, game_state)))
-        #print(t)
-        #print(self.ruch_wiezy(game_state))
-        #print(dirs[1])
-        #print(dirs)
-        #print(dirs)
-        #print(self.my_position)
-        #print((najlepsze_pole.x, najlepsze_pole.y))
         if dirs is None:
             return Pass()
         if len(dirs) < 2:
             return Pass()
 
-        #print(dirs)
-        #print(dirs[1])
 
         if dirs[1] == 'e':
             return Rotation(RotationDirection.RIGHT, RotationDirection.RIGHT)
@@ -617,6 +617,10 @@ class MyBot(HackathonBot):
         self.initialized_walls = False
         self.pola = [[0 for _ in range(24)] for _ in range(24)]
         self.walkable = [[0 for _ in range(24)] for _ in range(24)]
+        self.counter = 0
+        self.xv = 1
+        self.yv = 1
+        self.is_ok = False
         for poziom in range(len(self.pola)):
             for pole in range(len(self.pola[poziom])):
                 self.pola[poziom][pole] = Pole(pole, poziom)
