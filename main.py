@@ -293,16 +293,16 @@ class MyBot(HackathonBot):
                     self.counter += 1
             else:
                 self.xv, self.yv = random.choice(tils)
-                print((self.xv, self.yv))
+                #print((self.xv, self.yv))
         else:
             self.counter += 1
         self.pola[self.xv][self.yv].wsp += 3
-        print()
+        #print()
         if self.counter < 30:
-            print('a')
+            #print('a')
             dirs = self.get_directions(self.walkable, (self.my_position[0], self.my_position[1]), (self.xv, self.yv), convert_to_letters(get_direction_of_player(self.my_position, game_state)))
         else:
-            print('b')
+            #print('b')
             dirs = self.get_directions(self.walkable, (self.my_position[0], self.my_position[1]), (najlepsze_pole.x, najlepsze_pole.y), convert_to_letters(get_direction_of_player(self.my_position, game_state)))
 
         action = self.action_coefficient(game_state, najwyzszy_wsp_pol)
